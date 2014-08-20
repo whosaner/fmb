@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Class-Path: fmb-api-1.0.0-SNAPSHOT.jar log4j-1.2.16.jar fmb-impl-1.0.0
+ -SNAPSHOT.jar mysql-connector-java-5.1.6.jar jersey-servlet-1.16.jar 
+ jersey-server-1.16.jar asm-3.1.jar jersey-core-1.16.jar jersey-json-1
+ .16.jar jettison-1.1.jar jaxb-impl-2.2.3-1.jar jaxb-api-2.2.2.jar sta
+ x-api-1.0-2.jar activation-1.1.jar jackson-core-asl-1.9.2.jar jackson
+ -mapper-asl-1.9.2.jar jackson-jaxrs-1.9.2.jar jackson-xc-1.9.2.jar
+

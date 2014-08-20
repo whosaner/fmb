@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="ThaaliDataService" resourceRoot="" soapui-version="4.6.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://localhost:8080" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache/><con:endpoints><con:endpoint>http://localhost:8080</con:endpoint></con:endpoints><con:resource name="GetThaaliData" path="/fmb/rest/thaali/getThaaliData"><con:settings/><con:parameters><con:parameter><con:name>ejamaatId</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>password</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>fromDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>toDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>isVisible</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter></con:parameters><con:method name="GetThaaliData" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/xml</con:mediaType><con:status>200</con:status><con:params/><con:element>response</con:element></con:representation><con:request name="Request 1" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://54.186.45.156</con:endpoint><con:request/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="isVisible" value="true"/>
+  <con:entry key="fromDate" value="01/01/2014"/>
+  <con:entry key="ejamaatId" value="30308654"/>
+  <con:entry key="toDate" value="01/21/2014"/>
+  <con:entry key="password" value="test1234"/>
+</con:parameters></con:request></con:method></con:resource><con:resource name="UpdateThaaliData" path="/fmb/rest/thaali/updateThaaliData"><con:settings/><con:parameters/><con:method name="updateThaaliData" method="POST"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/xml</con:mediaType><con:status>200</con:status><con:params/><con:element>response</con:element></con:representation><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:request name="Request 1" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://54.186.45.156</con:endpoint><con:request>{
+    "eJamaatId": "30322554",
+    "password": "test123",
+    "dataList": [
+        {
+            "thaaliDateEntered": "03/17/2014",            
+            "thaaliDay": "MONDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/18/2014",            
+            "thaaliDay": "TUESDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/19/2014",            
+            "thaaliDay": "WEDNESDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/20/2014",            
+            "thaaliDay": "THURSDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/21/2014",            
+            "thaaliDay": "FRIDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/22/2014",            
+            "thaaliDay": "SATURDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/23/2014",            
+            "thaaliDay": "SUNDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/24/2014",            
+            "thaaliDay": "MONDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/25/2014",            
+            "thaaliDay": "TUESDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/26/2014",            
+            "thaaliDay": "WEDNESDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/27/2014",            
+            "thaaliDay": "THURSDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/28/2014",            
+            "thaaliDay": "FRIDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/29/2014",            
+            "thaaliDay": "SATURDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"true"            
+        },
+        {
+            "thaaliDateEntered": "03/30/2014",            
+            "thaaliDay": "SUNDAY",
+            "menu": "REQUESTED_BY_USER",
+            "coookName": "India Grille",
+            "instructions":"",
+            "adminName":"Hussain",
+            "status":"THAALI_PRESENT",
+            "visible":"false"            
+        }
+
+        
+
+    ]
+ }</con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource></con:interface><con:properties/><con:wssContainer/></con:soapui-project>
