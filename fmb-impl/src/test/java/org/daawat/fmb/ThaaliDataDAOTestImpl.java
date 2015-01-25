@@ -98,7 +98,7 @@ public class ThaaliDataDAOTestImpl extends TestCase {
 			for(int i=0;i<6;i++){
 				ThaaliData data1 =  new ThaaliData();		
 				data1.setAdminName("Hussain");
-				data1.setCoookName("Khadija");
+				data1.setCookName("Khadija");
 				Date date = sdf.parse(dateArr[i]);
 				data1.setThaaliDate(date);
 				data1.setCreationDate(date);

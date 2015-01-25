@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlRootElement(name="request")
-@XmlSeeAlso({UserProfileData.class,ThaaliData.class,UserThaaliData.class,UserThaaliView.class, ThaaliMenu.class, ThaaliRegion.class, ThaaliFeedback.class})
+@XmlSeeAlso({UserProfileData.class,ThaaliData.class,UserThaaliData.class,UserThaaliView.class, ThaaliMenu.class, ThaaliRegion.class, ThaaliFeedback.class, ThaaliCook.class})
 
 public class Request<T> {
 

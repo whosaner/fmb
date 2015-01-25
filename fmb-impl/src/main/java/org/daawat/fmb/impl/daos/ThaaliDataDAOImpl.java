@@ -119,7 +119,7 @@ public class ThaaliDataDAOImpl extends BaseJDBCDAO<ThaaliData> implements Thaali
 			thaaliData.setThaaliDate(resultSet.getDate("THAALI_DATE"));
 			thaaliData.setThaaliDay(resultSet.getString("THAALI_DAY"));
 			thaaliData.setMenu(resultSet.getString("MENU"));
-			thaaliData.setCoookName(resultSet.getString("COOKNAME"));
+			thaaliData.setCookName(resultSet.getString("COOKNAME"));
 			thaaliData.setInstructions(resultSet.getString("INSTRUCTIONS"));
 			thaaliData.setAdminName(resultSet.getString("ADMIN_NAME"));
 			thaaliData.setCreationDate(resultSet.getDate("CREATION_DATE"));

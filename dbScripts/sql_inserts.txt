@@ -1,4 +1,4 @@
-INSERT INTO `user_profile_tbl` VALUES
+INSERT INTO `USER_PROFILE_TBL` VALUES
 ('20357701','20357701','20357701','Campwala','Shaikh Husain bhai','USER','Large',3,'Delaware'),
 ('30464501','30464501','20357701','Campwala','Shamima bai Shaikh Husain bhai ','USER','Large',3,'Delaware'),
 ('20357702','20357702','20357702','Paghdiwala','Fatema bai Shabbir bhai ','USER','Small',22,'West Chester'),
@@ -46,5 +46,18 @@ INSERT INTO `user_profile_tbl` VALUES
 ('30701256','30701256','30701256','Zojwalla','Zoeb bhai','USER','Small',15,'Philadelphia'),
 ('30701257','30701257','30701256',' Zojwalla','Maleka bai Zoeb bhai','USER','Small',15,'Philadelphia'),
 ('30803243','30803243','30803243','Mithaiwala','Shabbir bhai','ADMIN','Small',16,'West Chester'),
-('40413033','40413033','40413033','Saeed','Taher bhai','ADMIN','Large',17,'Philadelphia')
+('40413033','40413033','40413033','Saeed','Taher bhai','ADMIN','Large',17,'Philadelphia');
+
+INSERT INTO `THAALI_REGION` VALUES
+('West Chester','City in PA'),
+('King Of Prussia','City in PA'),
+('Philadelphia','City in PA'),
+('Delaware','State in US');
+
+INSERT INTO FMB.`THAALI_COOK_TBL` VALUES
+('Taher bhai Adenwala'),('Khadija Behen Rangwala'),('Durriya ben Chinwala'),('Zainab ben Contractor'),('Umema ben Kothari'),('Tasneem ben Mithaiwala'),
+('Zainab ben Dohadwala'),('Farzana ben(Caterer)'),('Jumana ben Shakir'),('Zainab ben Saeed'),('Fatema ben Khambaty'),('Nisreen ben Mun'),
+('Kherun ben Merchant'),('Azra ben Amiji');
+
+
 

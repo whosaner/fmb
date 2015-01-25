@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -125,11 +126,12 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 	}
 
 
-	public void setUserThaaliDate(String userThaaliDate) {		
+	public void setUserThaaliDate(String userThaaliDate) {
 		this.userThaaliDate = userThaaliDate;
 		try {
-			if(userThaaliDate != null){
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+			if(userThaaliDate != null){				
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy",Locale.US);
+				//simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE_ID));
 				this.thaaliDate = simpleDateFormat.parse(userThaaliDate);
 			}
 			

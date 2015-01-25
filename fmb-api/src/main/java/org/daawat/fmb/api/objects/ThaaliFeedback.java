@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -114,7 +115,8 @@ public class ThaaliFeedback implements Serializable{
 		this.thaaliDateEntered = thaaliDateEntered;
 		try {
 			if(thaaliDateEntered != null){
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy",Locale.US);
+				//simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE_ID));
 				this.thaaliDate = simpleDateFormat.parse(thaaliDateEntered);
 			}
 			

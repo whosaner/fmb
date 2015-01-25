@@ -1,4 +1,8 @@
-CREATE TABLE `thaali_data_tbl` (
+CREATE DATABASE `FMB` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
+USE FMB;
+
+CREATE TABLE `THAALI_DATA_TBL` (
   `THAALI_DATE` date NOT NULL,
   `THAALI_DAY` varchar(12) DEFAULT NULL,
   `MENU` varchar(45) NOT NULL,
@@ -12,7 +16,7 @@ CREATE TABLE `thaali_data_tbl` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table will store the data for thaali for every day.';
 
 
-CREATE TABLE `thaali_feedback` (
+CREATE TABLE `THAALI_FEEDBACK` (
   `THAALI_DATE` date DEFAULT NULL,
   `EJAMAAT_ID` varchar(12) NOT NULL,
   `FIRST_NAME` varchar(45) NOT NULL,
@@ -27,14 +31,24 @@ CREATE TABLE `thaali_feedback` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
-CREATE TABLE `thaali_menu_tbl` (
+CREATE TABLE `THAALI_PAKAWNAAR_TBL` (
+  `COOKNAME` varchar(150) NOT NULL,
+  PRIMARY KEY (`COOKNAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `THAALI_MENU_TBL` (
   `MENU` varchar(100) NOT NULL,
   `USERNAME` varchar(45) NOT NULL,
   PRIMARY KEY (`MENU`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE `THAALI_COOK_TBL` (
+  `COOK` varchar(250) NOT NULL,
+  PRIMARY KEY (`COOK`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `thaali_region` (
+
+CREATE TABLE `THAALI_REGION` (
   `REGION_NAME` varchar(45) NOT NULL,
   `REGION_DESC` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`REGION_NAME`)
@@ -42,7 +56,7 @@ CREATE TABLE `thaali_region` (
 
 
 
-CREATE TABLE `user_profile_tbl` (
+CREATE TABLE `USER_PROFILE_TBL` (
   `EJAMAAT_ID` varchar(12) NOT NULL,
   `PASSWORD` varchar(12) NOT NULL,
   `HOF_EJAMAAT_ID` varchar(12) NOT NULL,
@@ -57,7 +71,7 @@ CREATE TABLE `user_profile_tbl` (
 
 
 
-CREATE TABLE `user_thaali_data_tbl` (
+CREATE TABLE `USER_THAALI_DATA_TBL` (
   `THAALI_DATE` date NOT NULL,
   `FAMILY_GROUP_ID` int(11) NOT NULL,
   `FIRST_NAME` varchar(45) NOT NULL,

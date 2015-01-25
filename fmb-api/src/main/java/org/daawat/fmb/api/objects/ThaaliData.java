@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -22,7 +23,7 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 	private Date thaaliDate; //Date on which thaali is there
 	private String thaaliDay; //Just a convenient way to know the day from the above thaaliDate;
 	private String menu; //Menu for that day
-	private String coookName; //person who made the food for that day
+	private String cookName; //person who made the food for that day
 	private String instructions; //instruction set by the admin for that day thaali
 	private String adminName; //name of the admin who created the thaali for this day.
 	@XmlTransient
@@ -37,12 +38,12 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 		
 	}
 	public ThaaliData(Date thaaliDate, String thaaliDay, String menu,
-			String coookName, String instructions, String adminName, ThaaliStatus status,boolean isVisible) {
+			String cookName, String instructions, String adminName, ThaaliStatus status,boolean isVisible) {
 		super();
 		this.thaaliDate = thaaliDate;
 		this.thaaliDay = thaaliDay;
 		this.menu = menu;
-		this.coookName = coookName;
+		this.cookName = cookName;
 		this.instructions = instructions;
 		this.adminName = adminName;
 		this.status = status;
@@ -71,13 +72,13 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 	public void setMenu(String menu) {
 		this.menu = menu;
 	}
-	public String getCoookName() {
-		return coookName;
+	public String getCookName() {
+		return cookName;
 	}
 	
 	
-	public void setCoookName(String coookName) {
-		this.coookName = coookName;
+	public void setCookName(String cookName) {
+		this.cookName = cookName;
 	}
 	public String getInstructions() {
 		return instructions;
@@ -135,7 +136,8 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 		this.thaaliDateEntered = thaaliDateEntered;
 		try {
 			if(thaaliDateEntered != null){
-				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
+				SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy",Locale.US);
+//				simpleDateFormat.setTimeZone(TimeZone.getTimeZone(TIMEZONE_ID));
 				this.thaaliDate = simpleDateFormat.parse(thaaliDateEntered);
 			}
 			
@@ -150,7 +152,7 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 		objList.add(thaaliDate);
 		objList.add(thaaliDay);
 		objList.add(menu);
-		objList.add(coookName);
+		objList.add(cookName);
 		objList.add(instructions);
 		objList.add(adminName);
 		objList.add(status.getValue());
@@ -163,7 +165,7 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 		List<Object> objList = new ArrayList<Object>();		
 		objList.add(thaaliDay);
 		objList.add(menu);
-		objList.add(coookName);
+		objList.add(cookName);
 		objList.add(instructions);
 		objList.add(adminName);
 		objList.add(status.getValue());
@@ -175,7 +177,7 @@ public class ThaaliData implements Serializable,Comparable<ThaaliData>{
 	@Override
 	public String toString() {
 		return "ThaaliData [thaaliDate=" + thaaliDate + ", thaaliDay="
-				+ thaaliDay + ", menu=" + menu + ", coookName=" + coookName
+				+ thaaliDay + ", menu=" + menu + ", cookName=" + cookName
 				+ ", instructions=" + instructions + ", adminName=" + adminName
 				+ ", creationDate=" + creationDate + ", status=" + status
 				+ ", isVisible=" + visible + ", thaaliDateEntered="

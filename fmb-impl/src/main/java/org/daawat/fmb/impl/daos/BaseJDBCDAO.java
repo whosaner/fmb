@@ -1,13 +1,16 @@
 package org.daawat.fmb.impl.daos;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 import org.daawat.fmb.utils.Logger;
 import org.daawat.fmb.utils.PropertyFileManager;
@@ -29,8 +32,23 @@ public  abstract class BaseJDBCDAO<T>{
 	protected int updateCount = 0;
 	private static final String COMP_NAME = "BaseJDBCDAO";
 	protected ResultSet resultSet = null;
+	private static DataSource datasource = null;
 	
-	
+	public BaseJDBCDAO(){
+		//We need to do some initializations
+		if(datasource == null){
+			Context initContext = null;
+			String dsJndiName = null;
+			try {
+				dsJndiName  = PropertyFileManager.getProperty( "datasourceJndi");
+				initContext = new InitialContext();
+				Context envContext  = (Context)initContext.lookup("java:/comp/env");
+				datasource = (DataSource)envContext.lookup(dsJndiName);
+			} catch (Exception e) {
+				Logger.error(COMP_NAME, "An exception has occurred in the static block - jndi name -"+dsJndiName, e);
+			}
+		}
+	}
 	
 	
 	/**
@@ -115,9 +133,15 @@ public  abstract class BaseJDBCDAO<T>{
 		Logger.info(COMP_NAME, "Packing the ResulSet completed ---");
 	}
 
-	
-	
 	private void getPrepareStatement(String sqlQuery) throws Exception {
+		this.connection = datasource.getConnection();
+		this.connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+		this.connection.setAutoCommit(true);
+		this.prepareStatement = connection.prepareStatement(sqlQuery);		
+		Logger.info(COMP_NAME, "Getting the prepared statement for the sql query --"+sqlQuery);
+	}
+	
+	/*private void getPrepareStatement(String sqlQuery) throws Exception {
 		String driverClass = PropertyFileManager.getProperty( "db.driverClassName");
 		String dbUrl = PropertyFileManager.getProperty( "db.url");
 		String username = PropertyFileManager.getProperty( "db.username");
@@ -133,7 +157,7 @@ public  abstract class BaseJDBCDAO<T>{
 		
 		Logger.info(COMP_NAME, "Getting the prepared statement for the sql query --"+sqlQuery+", for the db.url -"+dbUrl);
 
-	}
+	}*/
 	
 	/**
 	 * Releasing the resources.
