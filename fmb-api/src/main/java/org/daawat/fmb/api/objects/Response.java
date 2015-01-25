@@ -15,12 +15,9 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 public class Response<T>{
 
 	
-	private List<T> dataList;
-	
-	private String message;
-	
+	private List<T> dataList;	
+	private String message;	
 	private boolean isError;
-	
 	
 	
 	public Response(){

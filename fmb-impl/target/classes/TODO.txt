@@ -1,5 +1,0 @@
-1. Need to fix the code to get the database.properties from the classpath. Currently the file resides under fmb-impl.
-2. Need to redesign so that any new jamaat can easily use the code without making a lot of changes.
-
-3. Change the isVisible from boolean to String on the UI as well as backend. Thaali Data Table service
-4. Need to check if the Thaali Present is False, then user should not be able to make any modifications.
