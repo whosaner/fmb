@@ -2,7 +2,7 @@ package org.daawat.fmb.api.enums;
 
 public enum UserThaaliStatus {
 
-	REQUESTED_BY_USER("REQUESTED"), CANCELLED_BY_USER("CANCELLED"), NOT_REQUESTED_BY_USER("NOT_REQUESTED");
+	REQUESTED_BY_USER("REQUESTED"), CANCELLED_BY_USER("CANCELLED"), NOT_REQUESTED_BY_USER("NOT_REQUESTED"), REQUESTED_WITH_NO_RICE("REQUESTED_BUT_NO_RICE");
 
 	private String status ;
 	private UserThaaliStatus(String status){

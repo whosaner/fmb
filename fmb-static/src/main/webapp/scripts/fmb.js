@@ -7,6 +7,7 @@ var server_url = "http://"+host+context;
 
 /***List of variables that will change depending upon the jamaat and the server where the application is hosted **/
 var jamaatName="Anjuman-e-Fakhri, Philadelphia";
+var  contactPerson = "M. Adnan bhai Khambaty.";
 /******************************************************************************************************************/
 
 /***Variables that will remain same across jamaat ***********************/
@@ -36,7 +37,7 @@ var get_cookname_url=server_url+"/misc/getCook";
 var get_region_service_url=server_url+"/misc/getRegion";
 var thaali_count_service_url=server_url+"/misc/getThaaliCount";
 
-var msg_on_thaali_frozen = "No more Thaali Request's can be made for the particular day. Please contact M. Adnan bhai Khambaty.";
+var msg_on_thaali_frozen = "No more Thaali Request's can be made for the particular day. Please contact "+contactPerson;
 var on_delete_error_msg = 'You can only edit but not remove any existing thaali day present in the system.'
 var server_error_msg = 'An error has occurred while getting the data from the server. The error returned from the server is :';
 
@@ -45,14 +46,45 @@ var allowed_thaali_status_ui = ["Yes","No"];
 
 var user_thaali_status=["REQUESTED_BY_USER","CANCELLED_BY_USER","NOT_REQUESTED_BY_USER"];
 var user_thaali_status_ui = ["Yes","No"];
+
+var thaaliStatusMap = [{displayName:"Yes", serverName:"REQUESTED_BY_USER", status:"user_status"},
+                       {displayName:"No", serverName:"NOT_REQUESTED_BY_USER", status:"user_status"},
+                       {displayName:"Yes (No Rice)", serverName:"REQUESTED_WITH_NO_RICE", status:"user_status"},
+                       {displayName:"Yes", serverName:"THAALI_PRESENT", status:"thaali_status"},
+                       {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}]
+
 var user_thaali_category = ["Small","Medium","Large"];
 var num_of_days_to_Advance = 21; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
 
 var thaaliTblHeaders = {THAALI_MADE_BY:"Thaali <br/> Pakawnaar",MENU:"Menu", INSTRUCTIONS: "Instructions <br/> (If any)", THAALI_STATUS: "Status", THAALI_DATE: "Date", VISIBLE: "Visible <br/> to <br/> Jamaat"};
 var userThaaliTblHeaders = {MENU:"Menu", THAALI_STATUS: "Thaali Available for the day", THAALI_DATE: "Thaali <br/> Date", THAALI_CATEGORY: "Category", USER_THAALI_STATUS: "Thaali <br/> Requested"};
+
 var allUserThaaliTblHeaders = {FIRSTNAME:"First <br/> Name", FAMILY_NAME:"Family <br/> Name", LOCATION:"Region"};
-var userFeedbackTblHeaders={THAALI_DATE:"Thaali <br/> date",FEEDBACK_CREATION_DATE:"Creation <br/> Date", FIRSTNAME:"First <br/> Name", FAMILYNAME:"Family <br/> Name",FEEDBACK_COMMENTS:"Comments", THAALI_MENU:"Menu", THAALI_QLTY:"Quality", THAALI_QTY:"Quantity",THAALI_CATEGORY:"Category"};
+var allUserThaaliTblHeadersMobile = {FIRSTNAME:"First <br/> Name", FAMILY_NAME:"Name", LOCATION:"Region"};
+
+
+var userFeedbackTblHeaders=[{Name:"Creation <br/> Date", Width:"15%"},
+                            {Name:"Thaali <br/> date", Width:"15%"}, 
+                            {Name:"Menu", Width:"10%"},
+                            {Name:"Quality", Width:"10%"}, 
+	 						{Name:"Quantity", Width:"10%"},
+	 						{Name:"Comments", Width:"20%"}, 
+	 						{Name:"First <br/> Name", Width:"10%"}, 
+ 		 					{Name:"Family <br/> Name", Width:"10%"}];
+
+var userFeedbackTblHeadersMobile=[{Name:"Creation <br/> Date", Width:"15%"},
+                                  {Name:"Date", Width:"20%"}, 
+                                  {Name:"Menu", Width:"20%"}, 
+ 		 						  {Name:"Qlty", Width:"10%"}, 
+ 		 						  {Name:"Qty", Width:"10%"},
+ 		 						  {Name:"Comments", Width:"30%"},
+		 						  {Name:"First <br/> Name", Width:"10%"}, 
+		 						  {Name:"Name", Width:"20%"}];
+
+
 var thaaliCountTblHdr = {THAALI_DATE:"Date",SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
+var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",SMALL_THAALI:"S", MEDIUM_THAALI:"M", LARGE_THAALI:"L", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
+
 
 var maxRowsAllowedToBeAdded = 60;
 var rowLimit = 100; //gets the number of user feedback at one time.
@@ -716,35 +748,28 @@ onLoadUserThaaliView = function(){
         		if(records != null && records.length > 0){
                		for (var i = 0; i < records.length; i++) {
             			var record = records[i]; 
-            			var status = record.thaaliStatus;
+            			var status = record.thaaliStatus;            			
+            			var userStatus = record.userThaaliStatus;
+            			
             			if(status != null){
-            				//This is done to show user a more use friendly thaali status rather than showing THAALI_PRESENT and THAALI_NOT_PRESENT
-                			if(status == allowed_thaali_status[0]){
-                				//means thaali is present
-                				record.thaaliStatusUI = allowed_thaali_status_ui[0];
-                			}else{
-                				record.thaaliStatusUI = allowed_thaali_status_ui[1];
-                			}
-                			
                 			//This is done to show user a more use friendly thaali status rather than showing
-                			var userStatus = record.userThaaliStatus;    			
-                			if(userStatus == user_thaali_status[0]){
-                				//requested by user
-                				record.userThaaliStatusUI = user_thaali_status_ui[0];
-                			}else{
-                				//not requested by user
-                				record.userThaaliStatusUI = user_thaali_status_ui[1];
+                			for(var mapCnt=0;mapCnt<thaaliStatusMap.length;mapCnt++){
+                				if(thaaliStatusMap[mapCnt].serverName == userStatus){
+                					record.userThaaliStatusUI = thaaliStatusMap[mapCnt].displayName;
+                				}
+                				if(thaaliStatusMap[mapCnt].serverName == status){
+                    				record.thaaliStatusUI = thaaliStatusMap[mapCnt].displayName;
+                    			}
                 			}
                 			
+                			               			
                 			if(record.thaaliStatusUI == "No" ){
                 				//This is done when there is no thaali present for a particular day. in that case user's thaali request should be automatically marked as No.
                 				record.userThaaliStatusUI = "No";
-                			}
-                			
+                			}                			
                 			data.push(record);
             			}
             		}
-
         		}
          		return data;
         	}        	
@@ -802,7 +827,13 @@ onLoadUserThaaliView = function(){
              },             	
              createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {                	
                  // assign a new data source to the dropdownlist.
-                 var list = user_thaali_status_ui;
+            	 var list = [];
+            	 for(var i=0;i<thaaliStatusMap.length;i++){
+            		 if(thaaliStatusMap[i].status == "user_status"){
+            			 list.push(thaaliStatusMap[i].displayName);
+            		 }            		  
+            	 }
+                 
                  editor.jqxDropDownList({theme:themeName,autoDropDownHeight: true, source: list,autoOpen:true,enableBrowserBoundsDetection:true });
              },
              // update the editor's value before saving it.
@@ -900,15 +931,14 @@ onLoadUserThaaliView = function(){
         //Check if user had already signed up for the thaali or not, 
         //if the user has already signed up and isLocked is true then he/she should be given an option to modify or cancel.
         //If not signed up earlier show message and no modifications should be allowed...
-        
+         
         if(rowData.thaaliStatusUI == "No"){
         	msg = rowData.thaaliInstructions;        	 //In case if Thaali is not present for the day, we still need to disable the said columns and also thaali requested field should be automatically marked as NO.            
         	showMessage = true;
         }
         
-        
         if(isLocked == true){
-        	if(rowData.userThaaliStatusUI === "No"){
+        	if(rowData.userThaaliStatusUI == "No"){
         		//Means the thaali date has been frozen...no more modifications allowed at this time.
             	showMessage = true; 
         	}else{
@@ -916,6 +946,7 @@ onLoadUserThaaliView = function(){
         		// make sure the thaali date is a future date and not a past date.
         		var today = new Date();
         		if(rowData.thaaliDate < today){
+        			msg = "Thaali Date has already been passed. No more changes are allowed.";
         			showMessage = true;
         		}
         	}        	       
@@ -1026,20 +1057,17 @@ onLoadUserThaaliView = function(){
     			//This is done to show user a more use friendly thaali status rather than showing
     			var mUserThaaliStatus = record.userThaaliStatusUI; //Thaali Status that might have been modified by the User
     			
-    			if(mUserThaaliStatus == user_thaali_status_ui[0]){
-    				//Means User has selected thaali for that particular date.
-    				userRecord.userThaaliStatus = user_thaali_status[0];
-    			}
-    			else {
-    				//Means user has not requested thaali's
-    				userRecord.userThaaliStatus = user_thaali_status[2];
-    			}
     			
+    			//This is done to show user a more use friendly thaali status rather than showing
+    			for(var mapCnt=0;mapCnt<thaaliStatusMap.length;mapCnt++){
+    				if(thaaliStatusMap[mapCnt].status == "user_status" && thaaliStatusMap[mapCnt].displayName == mUserThaaliStatus){
+    					userRecord.userThaaliStatus = thaaliStatusMap[mapCnt].serverName;
+    				}    				
+    			}    			
+    			    			
     			userRecord.thaaliDate = record.thaaliDate;
-    			userRecord.thaaliCategory = record.userThaaliCategory;
-    			
-    			userRecord.userThaaliDate = getFormattedDate(record.thaaliDate); //formatting the date before sending it out..
-    			
+    			userRecord.thaaliCategory = record.userThaaliCategory;    			
+    			userRecord.userThaaliDate = getFormattedDate(record.thaaliDate); //formatting the date before sending it out..    			
     			mRowArr.push(userRecord);
     		}
     		jsonData.dataList = mRowArr;
@@ -1055,7 +1083,7 @@ onLoadUserThaaliView = function(){
     			},
     			error: function(){
     				display(errorMsg);    				
-    			}    			
+    			}
     		});
     	}
     	updatedRecordsArr = []; //reset it to blank once everything is updated in the database.
@@ -1128,7 +1156,13 @@ onLoadThaaliCount = function(){
    var columnsrenderer = function (value) {
    	return '<div style="text-align: center; margin-top: 5px;">' + value + '</div>';
    }
-      
+    
+   getThaaliCountTblHdr = function(){
+	   if(isMobileView()){
+		   return thaaliCountTblHdrMobile;
+	   }
+	   return thaaliCountTblHdr;
+   }
              
    $(gridName).jqxGrid(
    {	
@@ -1146,12 +1180,12 @@ onLoadThaaliCount = function(){
        editable: true,
        pagesize: 7,
        columns: [
-           { text: thaaliCountTblHdr.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '25%', cellsalign: 'center', editable: false, cellsformat: 'D'},       
-           { text: thaaliCountTblHdr.SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: thaaliCountTblHdr.MEDIUM_THAALI, datafield: 'numOfMediumThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: thaaliCountTblHdr.LARGE_THAALI, datafield: 'numOfLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: thaaliCountTblHdr.JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: thaaliCountTblHdr.RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false }         
+           { text: getThaaliCountTblHdr().THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '25%', cellsalign: 'center', editable: false, cellsformat: 'D'},       
+           { text: getThaaliCountTblHdr().SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
+           { text: getThaaliCountTblHdr().MEDIUM_THAALI, datafield: 'numOfMediumThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
+           { text: getThaaliCountTblHdr().LARGE_THAALI, datafield: 'numOfLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
+           { text: getThaaliCountTblHdr().JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
+           { text: getThaaliCountTblHdr().RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false }         
            
        ]
    });
@@ -1247,14 +1281,20 @@ onLoadViewThaaliAll = function(){
        url: createAllUserThaaliDataGetUrl(currentDate, toDate)
    };
    
+   getAllUserThaaliTblHeaders = function(){
+	   if(isMobileView()){
+		   return allUserThaaliTblHeadersMobile;
+	   }
+	   return allUserThaaliTblHeaders;
+   }
+   
    createDynamicColumns = function(){
 	   var columns = new Array();
 	   var numOfdynamicCols = columnNames.length; 
 	   
 		   
-	   var location =  { text: allUserThaaliTblHeaders.LOCATION, datafield: 'location', renderer: columnsrenderer, cellsalign: 'center',   width: '20%', editable: false };	  
-	   var familyName =  { text: allUserThaaliTblHeaders.FAMILY_NAME, datafield: 'familyName', renderer: columnsrenderer, cellsalign: 'center',   width: '30%', editable: false };
-	   //var fName =  { text: allUserThaaliTblHeaders.FIRSTNAME, datafield: 'firstName', renderer: columnsrenderer, cellsalign: 'center',   width: defWidth, editable: false };
+	   var location =  { text: getAllUserThaaliTblHeaders().LOCATION, datafield: 'location', renderer: columnsrenderer, cellsalign: 'center',   width: '20%', editable: false };	  
+	   var familyName =  { text: getAllUserThaaliTblHeaders().FAMILY_NAME, datafield: 'familyName', renderer: columnsrenderer, cellsalign: 'center',   width: '30%', editable: false };
 	   
 	   columns.push(location);
 	   //columns.push(fName); //No need to have the first name if the family name is unique.
@@ -1263,7 +1303,7 @@ onLoadViewThaaliAll = function(){
 	   var defWidth = 50/numOfdynamicCols + '%'; //60% width is remaining if you remove the above 2 columns.
 	   for(var i=0;i<columnNames.length;i++){
 		   var colName = columnNames[i];
-		   var obj = {text: colName, datafield: colName, renderer: columnsrenderer, cellsalign: 'center',   width: defWidth, editable: false };
+		   var obj = {text: colName, datafield: colName, renderer: columnsrenderer, cellsalign: 'center',   width: defWidth, editable: false};
 		   columns.push(obj);
 	   }
 	   
@@ -1287,28 +1327,30 @@ onLoadViewThaaliAll = function(){
       		}
       	},
       	beforeLoadComplete: function (records,oData){
-      		columnNames = new Array();
+      		columnNames = new Array();      		      	
       		if(oData != null && oData.dataList != null){
       			records = oData.dataList;
           		for (var i = 0; i < records.length; i++) {
-          			var record = records[i]; 
+          			var record = records[i];
           			if(record.familyGroupId){
           				//Just making sure that the record is valid and it is not some junk.
           			    var thaaliDataArr = record.userThaaliDayWiseData;
           			    //We need to get the column names which would be the thaali dates.       			              			
-              			if(thaaliDataArr != null && thaaliDataArr.length > 0){           				
+              			if(thaaliDataArr != null && thaaliDataArr.length > 0){         				
                   			for(var j=0;j<thaaliDataArr.length;j++){
                   				var thaaliDataDayWise = thaaliDataArr[j];
                   				var thaaliDate = thaaliDataDayWise.thaaliDate;
                   			  //populating the column name only the first time.
                   				if(i == 0){
                   					columnNames.push(thaaliDate); //format would be yyyy-mm-dd 
-                  				}
+                  				}                  				
                   				if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_BY_USER"){
-                  					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory;               					
+                  					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory;             					
+                  				}else if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_WITH_NO_RICE"){
+                  					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory+" "+"<sub>No Rice</sub>";                  					
                   				}else{
-                  					records[i][thaaliDate] = "NO";
-                  				}    				
+                  					records[i][thaaliDate] = "No";
+                  				}
                   			}
               			}           			           			
           			}       			
@@ -1792,7 +1834,13 @@ onLoadUserFeedback = function(){
     	return '<div style="text-align: center; margin-top: 5px;">' + value + '</div>';
     }
     
-              
+    getTableHeader  = function(){
+    	if(isMobileView()){
+    		return userFeedbackTblHeadersMobile;
+    	}
+    	return userFeedbackTblHeaders;
+    }
+    
     $("#jqxUserFeedbackGrid").jqxGrid(
     {	
     	source: getDataAdapter(source),
@@ -1807,16 +1855,16 @@ onLoadUserFeedback = function(){
         columnsresize:true,
         columnsheight: columnsHeight,
         editable: true,
-        pagesize: 7,    
+        pagesize: 7,         
         columns: [
-            { text: userFeedbackTblHeaders.FEEDBACK_CREATION_DATE, datafield: 'feedbackCreationDate', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false,cellsformat: 'D' },
-            { text: userFeedbackTblHeaders.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '15%', cellsalign: 'center', editable: false, cellsformat: 'D'}, 
-            { text: userFeedbackTblHeaders.THAALI_MENU, datafield: 'thaaliMenu', renderer: columnsrenderer, cellsalign: 'center',  width: '10%', editable: false },
-            { text: userFeedbackTblHeaders.THAALI_QLTY, datafield: 'qualityRating', renderer: columnsrenderer, cellsalign: 'center',  width: '10%', editable: false },
-            { text: userFeedbackTblHeaders.THAALI_QTY, datafield: 'quantityRating', renderer: columnsrenderer, cellsalign: 'center',  width: '10%', editable: false },
-            { text: userFeedbackTblHeaders.FEEDBACK_COMMENTS, datafield: 'thaaliFeedback', renderer: columnsrenderer, cellsalign: 'center',  width: '20%', editable: false },
-            { text: userFeedbackTblHeaders.FIRSTNAME, datafield: 'firstName', renderer: columnsrenderer, cellsalign: 'center',  width: '10%', editable: false },
-            { text: userFeedbackTblHeaders.FAMILYNAME, datafield: 'familyName', renderer: columnsrenderer, cellsalign: 'center',  width: '10%', editable: false }
+            { text: getTableHeader()[0].Name, datafield: 'feedbackCreationDate', renderer: columnsrenderer, cellsalign: 'center',   width: getTableHeader()[0].Width, editable: false,cellsformat: 'D', hidden: isMobileView() },
+            { text: getTableHeader()[1].Name, datafield: 'thaaliDate', renderer: columnsrenderer, width: getTableHeader()[1].Width, cellsalign: 'center', editable: false, cellsformat: 'D'}, 
+            { text: getTableHeader()[2].Name, datafield: 'thaaliMenu', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[2].Width, editable: false },
+            { text: getTableHeader()[3].Name, datafield: 'qualityRating', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[3].Width, editable: false },
+            { text: getTableHeader()[4].Name, datafield: 'quantityRating', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[4].Width, editable: false, hidden: isMobileView() },
+            { text: getTableHeader()[5].Name, datafield: 'thaaliFeedback', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[5].Width, editable: false },
+            { text: getTableHeader()[6].Name, datafield: 'firstName', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[6].Width, editable: false, hidden: isMobileView() },
+            { text: getTableHeader()[7].Name, datafield: 'familyName', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[7].Width, editable: false }
         ]
     });
        	

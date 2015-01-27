@@ -32,17 +32,25 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 		// TODO Auto-generated method stub
 		List<ThaaliCount> thaaliCounts = new ArrayList<ThaaliCount>();
 		while(resultSet.next()){
-			ThaaliCount thaaliCount = new ThaaliCount();
-			int small = resultSet.getInt("SMALL");
-			int medium = resultSet.getInt("MED");
-			int large = resultSet.getInt("LARGE");
-					
+			ThaaliCount thaaliCount = new ThaaliCount();			
+			
+			int small =  resultSet.getInt("SMALL");
+			int medium = resultSet.getInt("MED");			
+			int large =  resultSet.getInt("LARGE");
+			
+			//set num of rice cups b4 calculating thaalis with no rice.
+			thaaliCount.setNumOfRiceCups(calculateNumOfRiceCups(small, medium, large));
+			
+			small += resultSet.getInt("SMALL_NO_RICE");
+			medium += resultSet.getInt("MED_NO_RICE");
+			large += resultSet.getInt("LARGE_NO_RICE");
+			
 			thaaliCount.setNumOfSmallThaalis(small);
 			thaaliCount.setNumOfMediumThaalis(medium);
 			thaaliCount.setNumOfLargeThaalis(large);
 			thaaliCount.setThaaliDate(resultSet.getDate("THAALI_DATE"));
 			thaaliCount.setJamanQty(calculateJamanQty(small,medium,large));
-			thaaliCount.setNumOfRiceCups(calculateNumOfRiceCups(small, medium, large));
+			
 			thaaliCount.setInstructions("");			
 			thaaliCounts.add(thaaliCount);			
 		}

@@ -369,6 +369,11 @@ public class UserThaaliDataService extends BaseService{
 						//since we know for sure that there are thaalis present for the date range given...lets get the thaali data for all users.
 						userThaaliDataList = userThaaliDataDAO.getThaaliDataAllUsers(fromDate, toDate, userThaaliStatus);
 						
+						if(UserThaaliStatus.REQUESTED_BY_USER.equals(userThaaliStatus)){
+							//In this case we are also interested in getting the thaalis with no rice as well...
+							userThaaliDataList.addAll(userThaaliDataDAO.getThaaliDataAllUsers(fromDate, toDate, UserThaaliStatus.REQUESTED_WITH_NO_RICE));
+						}
+						
 						/*the data returned from the above call would contain multiple rows per family and each row representing one day of thaali. we need to convert it to one row per family
 						with multiple columns each column representing one day of thaali.*/						
 						if(userThaaliDataList != null && userThaaliDataList.size() > 0){
