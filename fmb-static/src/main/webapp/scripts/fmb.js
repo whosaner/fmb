@@ -361,7 +361,7 @@ onLoadThaaliSchedule = function () {
                 rowsheight: 40,
                 columnsheight: columnsHeight,
                 columnsresize:true,  
-                pagesize: 7,
+                pagesize: getPageSize(),
                 editable: true,
                 columns: [
                     { text: thaaliTblHeaders.THAALI_MADE_BY, datafield: 'cookName', renderer: columnsrenderer,  cellsalign: 'center', width: '15%', columntype: 'combobox',
@@ -761,8 +761,7 @@ onLoadUserThaaliView = function(){
                     				record.thaaliStatusUI = thaaliStatusMap[mapCnt].displayName;
                     			}
                 			}
-                			
-                			               			
+                			                			               			
                 			if(record.thaaliStatusUI == "No" ){
                 				//This is done when there is no thaali present for a particular day. in that case user's thaali request should be automatically marked as No.
                 				record.userThaaliStatusUI = "No";
@@ -885,16 +884,7 @@ onLoadUserThaaliView = function(){
     	return columnArr;
     }
     
-    /**
-     * Determines the number of records to be displayed in a page depending upon the size of the screen.
-     * @returns {Number}
-     */
-    getPageSize = function(){
-    	if(isMobileView()){
-    		return 4;
-    	}
-    	return 7;
-    }
+    
            
     $("#jqxUserThaaliDataGrid").jqxGrid(
     {	
@@ -909,7 +899,7 @@ onLoadUserThaaliView = function(){
         columnsheight: columnsHeight,
         editable: true,
         autorowheight:true,
-        pagesize: 7,      
+        pagesize: getPageSize(),      
         columns: getColumns()
     });
     
@@ -1178,7 +1168,7 @@ onLoadThaaliCount = function(){
        columnsresize:true, 
        columnsheight: columnsHeight,
        editable: true,
-       pagesize: 7,
+       pagesize: getPageSize(),
        columns: [
            { text: getThaaliCountTblHdr().THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '25%', cellsalign: 'center', editable: false, cellsformat: 'D'},       
            { text: getThaaliCountTblHdr().SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
@@ -1387,16 +1377,16 @@ onLoadViewThaaliAll = function(){
    	altrows: true,
    	width: '100%',
    	autorowheight:true,
-       height: '100%',
-       pageable: true,
-       rowsheight: 40,
-       columnsresize:true,
-       columnsheight: columnsHeight,
-       editable: true,
-       pagesize: 7,
-       columns:  [],
-       groupable:true,
-       groups: ['location']
+    height: '100%',
+    pageable: true,
+    rowsheight: 40,
+    columnsresize:true,
+    columnsheight: columnsHeight,
+    editable: true,
+    pagesize: getPageSize(),
+    columns:  [],
+    groupable:true,
+    groups: ['location']
    });
    
   
@@ -1855,7 +1845,7 @@ onLoadUserFeedback = function(){
         columnsresize:true,
         columnsheight: columnsHeight,
         editable: true,
-        pagesize: 7,         
+        pagesize: getPageSize(),         
         columns: [
             { text: getTableHeader()[0].Name, datafield: 'feedbackCreationDate', renderer: columnsrenderer, cellsalign: 'center',   width: getTableHeader()[0].Width, editable: false,cellsformat: 'D', hidden: isMobileView() },
             { text: getTableHeader()[1].Name, datafield: 'thaaliDate', renderer: columnsrenderer, width: getTableHeader()[1].Width, cellsalign: 'center', editable: false, cellsformat: 'D'}, 
@@ -1871,6 +1861,17 @@ onLoadUserFeedback = function(){
 }
 
 
+
+/**
+ * Determines the number of records to be displayed in a page depending upon the size of the screen.
+ * @returns {Number}
+ */
+getPageSize = function(){
+	if(isMobileView()){
+		return 4;
+	}
+	return 7;
+}
 
 /**
  * Utility function to create the thaali url to get the ThaaliData for the Admin to view/update.
@@ -2075,7 +2076,7 @@ getCookie = function(){
 	return cookieJsonObj;
 }
 
-function display(msg){	
+function display(msg){
 	// We need to do this only on bigger screens....
 	if(isMobileView()){
 		alert(msg);
