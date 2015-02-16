@@ -3,7 +3,9 @@ package org.daawat.fmb.web.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -355,17 +357,18 @@ public class UserThaaliDataService extends BaseService{
 				ThaaliDataDAO thaaliDataDAO = new ThaaliDataDAOImpl();		
 				List<ThaaliData> thaaliDataList = thaaliDataDAO.getThaaliData(fromDate, toDate, ThaaliStatus.THAALI_PRESENT);
 				
-				List<Date> dateList = new ArrayList<Date>();
+				Map<Date, String> dateMap = new LinkedHashMap<Date, String>();
 				if(thaaliDataList != null){
 					for(int i=0;i<thaaliDataList.size();i++){
 						ThaaliData thaaliData = thaaliDataList.get(i);
 						if(thaaliData.isVisible()){
 							//Only interested in days which are visible.
-							dateList.add(thaaliData.getThaaliDate());
+							dateMap.put(thaaliData.getThaaliDate(), thaaliData.getMenu());
+							
 						}
 					}
 					
-					if(dateList.size() > 0){
+					if(dateMap.size() > 0){
 						//since we know for sure that there are thaalis present for the date range given...lets get the thaali data for all users.
 						userThaaliDataList = userThaaliDataDAO.getThaaliDataAllUsers(fromDate, toDate, userThaaliStatus);
 						
@@ -386,7 +389,7 @@ public class UserThaaliDataService extends BaseService{
 								int groupId = userThaaliData.getFamilyGroupId();
 								
 								if(previousGroupId != groupId){
-									List<UserThaaliDayWiseData> userThaaliDayWiseData = getUserThaaliDayWiseData(dateList, groupId, userThaaliDataList);
+									List<UserThaaliDayWiseData> userThaaliDayWiseData = getUserThaaliDayWiseData(dateMap, groupId, userThaaliDataList);
 									userThaaliReport = new UserThaaliReport();									
 									userThaaliReport.setFamilyGroupId(groupId);
 									userThaaliReport.setFamilyName(userThaaliData.getFamilyName());
@@ -437,14 +440,16 @@ public class UserThaaliDataService extends BaseService{
 	 * @param userThaaliDataList
 	 * @return
 	 */
-	public List<UserThaaliDayWiseData> getUserThaaliDayWiseData(List<Date> dateList, int groupId, List<UserThaaliData> userThaaliDataList){
-		List<UserThaaliDayWiseData> userThaaliDayWiseDataList = new ArrayList<UserThaaliDayWiseData>(dateList.size());
-		for(int i=0;i<dateList.size();i++){
-			Date date = dateList.get(i);
+	public List<UserThaaliDayWiseData> getUserThaaliDayWiseData(Map<Date, String> dateMap, int groupId, List<UserThaaliData> userThaaliDataList){
+		List<UserThaaliDayWiseData> userThaaliDayWiseDataList = new ArrayList<UserThaaliDayWiseData>(dateMap.size());
+		for(Map.Entry<Date, String> entry: dateMap.entrySet()){
+			Date date = entry.getKey();
+			String menu = entry.getValue();
 			boolean isMatched = false;
 			
 			UserThaaliDayWiseData userThaaliDayWiseData = new UserThaaliDayWiseData();
 			userThaaliDayWiseData.setThaaliDate(date);
+			userThaaliDayWiseData.setMenu(menu);
 			for(int j=0;j<userThaaliDataList.size();j++){
 				UserThaaliData userThaaliData = userThaaliDataList.get(j);
 				if(userThaaliData.getFamilyGroupId() == groupId && userThaaliData.getThaaliDate().compareTo(date) == 0){

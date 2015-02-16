@@ -83,7 +83,7 @@ var userFeedbackTblHeadersMobile=[{Name:"Creation <br/> Date", Width:"15%"},
 
 
 var thaaliCountTblHdr = {THAALI_DATE:"Date",TOTAL_THAALI:"Total", SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
-var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"T", SMALL_THAALI:"S", MEDIUM_THAALI:"M", LARGE_THAALI:"L", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
+var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"Tot", SMALL_THAALI:"Sm", MEDIUM_THAALI:"Med", LARGE_THAALI:"Lg", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
 
 
 var maxRowsAllowedToBeAdded = 60;
@@ -1308,8 +1308,9 @@ onLoadViewThaaliAll = function(){
 	   
 	   var defWidth = 50/numOfdynamicCols + '%'; //60% width is remaining if you remove the above 2 columns.
 	   for(var i=0;i<columnNames.length;i++){
-		   var colName = columnNames[i];
-		   var obj = {text: colName, datafield: colName, renderer: columnsrenderer, cellsalign: 'center',   width: defWidth, editable: false};
+		   var colObj = columnNames[i];
+		   var colName = colObj.date + '<br/>' + colObj.menu;
+		   var obj = {text: colName, datafield: colObj.date, renderer: columnsrenderer, cellsalign: 'center',   width: defWidth, editable: false};
 		   columns.push(obj);
 	   }
 	   
@@ -1345,10 +1346,11 @@ onLoadViewThaaliAll = function(){
               			if(thaaliDataArr != null && thaaliDataArr.length > 0){         				
                   			for(var j=0;j<thaaliDataArr.length;j++){
                   				var thaaliDataDayWise = thaaliDataArr[j];
-                  				var thaaliDate = thaaliDataDayWise.thaaliDate;
+                  				var thaaliDate = thaaliDataDayWise.thaaliDate; 
+                  				var menu = thaaliDataDayWise.menu;
                   			  //populating the column name only the first time.
                   				if(i == 0){
-                  					columnNames.push(thaaliDate); //format would be yyyy-mm-dd 
+                  					columnNames.push({date: thaaliDate, menu: menu}); //format would be yyyy-mm-dd 
                   				}                  				
                   				if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_BY_USER"){
                   					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory;             					
