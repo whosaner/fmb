@@ -1,8 +1,8 @@
 /** Initializing variables **/
-var host = "69.164.214.37";
+var host = "www.sbfaiz.org";
 //var host="localhost:8080";
 var context = "/ajf/rest";
- 
+
 var server_url = "http://"+host+context;
 
 /***List of variables that will change depending upon the jamaat and the server where the application is hosted **/
@@ -39,7 +39,7 @@ var thaali_count_service_url=server_url+"/misc/getThaaliCount";
 
 var msg_on_thaali_frozen = "No more Thaali Request's can be made for the particular day. Please contact "+contactPerson;
 var on_delete_error_msg = 'You can only edit but not remove any existing thaali day present in the system.'
-var server_error_msg = 'An error has occurred while getting the data from the server. The error returned from the server is :';
+var server_error_msg = 'An error has occurred while getting the data from the server. Please try again';
 
 var allowed_thaali_status = ["THAALI_PRESENT","THAALI_NOT_PRESENT"];
 var allowed_thaali_status_ui = ["Yes","No"];
@@ -54,7 +54,7 @@ var thaaliStatusMap = [{displayName:"Yes", serverName:"REQUESTED_BY_USER", statu
                        {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}]
 
 var user_thaali_category = ["Small","Medium","Large"];
-var num_of_days_to_Advance = 21; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
+var num_of_days_to_Advance = 30; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
 
 var thaaliTblHeaders = {THAALI_MADE_BY:"Thaali <br/> Pakawnaar",MENU:"Menu", INSTRUCTIONS: "Instructions <br/> (If any)", THAALI_STATUS: "Status", THAALI_DATE: "Date", VISIBLE: "Visible <br/> to <br/> Jamaat"};
 var userThaaliTblHeaders = {MENU:"Menu", THAALI_STATUS: "Thaali Available for the day", THAALI_DATE: "Thaali <br/> Date", THAALI_CATEGORY: "Category", USER_THAALI_STATUS: "Thaali <br/> Requested"};
@@ -82,8 +82,8 @@ var userFeedbackTblHeadersMobile=[{Name:"Creation <br/> Date", Width:"15%"},
 		 						  {Name:"Name", Width:"20%"}];
 
 
-var thaaliCountTblHdr = {THAALI_DATE:"Date",SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
-var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",SMALL_THAALI:"S", MEDIUM_THAALI:"M", LARGE_THAALI:"L", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
+var thaaliCountTblHdr = {THAALI_DATE:"Date",TOTAL_THAALI:"Total", SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
+var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"T", SMALL_THAALI:"S", MEDIUM_THAALI:"M", LARGE_THAALI:"L", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
 
 
 var maxRowsAllowedToBeAdded = 60;
@@ -108,7 +108,7 @@ var defaultCookName = "TBD";
 var allowedDiffBetweenDays = 7;
 
 var date_error_msg = "Invalid Date. From Date cannot be greater than To Date.";
-var welcomeMessage = "Baad Salam-il Jameel ";
+var welcomeMessage = "Baad Salam-il Jameel, ";
 
 //Height of the column header.
 var columnsHeight= 60;
@@ -307,7 +307,7 @@ onLoadThaaliSchedule = function () {
             
             var dataAdapter = new $.jqx.dataAdapter(source,{
             	loadError: function(jqXHR, status, error){
-            		$("#thaaliScheduleMsgContent").html(server_error_msg + error);
+            		$("#thaaliScheduleMsgContent").html(server_error_msg);
                 	$("#thaaliScheduleMsgPopup").jqxWindow('open');
             	},
             	//This method will get invoked when the data is returned from the server.
@@ -364,17 +364,7 @@ onLoadThaaliSchedule = function () {
                 pagesize: getPageSize(),
                 editable: true,
                 columns: [
-                    { text: thaaliTblHeaders.THAALI_MADE_BY, datafield: 'cookName', renderer: columnsrenderer,  cellsalign: 'center', width: '15%', columntype: 'combobox',
-                        createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
-                            // assign a new data source to the combobox.
-                            editor.jqxComboBox({theme:themeName, source:cookAdapter,displayMember: "cookName", valueMember: "cookName", autoDropDownHeight: true, promptText: "Please Choose a Thaali Pakawanaar or Enter one:", enableBrowserBoundsDetection:true});
-                        },
-                        // update the editor's value before saving it.
-                        cellvaluechanging: function (row, column, columntype, oldvalue, newvalue) {
-                            // return the old value, if the new value is empty.
-                            if (newvalue == "") return oldvalue;
-                        } 
-                    },
+                    { text: thaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDateEntered', renderer: columnsrenderer, width: '20%', cellsalign: 'center', editable: false, cellsformat: 'D'},                    
                     { text: thaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center',   width: '20%', columntype: 'combobox',
                         createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
                             // assign a new data source to the combobox.
@@ -387,7 +377,17 @@ onLoadThaaliSchedule = function () {
                         }
                         
                     },
-                    { text:  thaaliTblHeaders.INSTRUCTIONS, datafield: 'instructions', renderer: columnsrenderer, cellsalign: 'center',  width: '20%' },
+                    { text: thaaliTblHeaders.THAALI_MADE_BY, datafield: 'cookName', renderer: columnsrenderer,  cellsalign: 'center', width: '15%', columntype: 'combobox',
+                        createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
+                            // assign a new data source to the combobox.
+                            editor.jqxComboBox({theme:themeName, source:cookAdapter,displayMember: "cookName", valueMember: "cookName", autoDropDownHeight: true, promptText: "Please Choose a Thaali Pakawanaar or Enter one:", enableBrowserBoundsDetection:true});
+                        },
+                        // update the editor's value before saving it.
+                        cellvaluechanging: function (row, column, columntype, oldvalue, newvalue) {
+                            // return the old value, if the new value is empty.
+                            if (newvalue == "") return oldvalue;
+                        } 
+                    },                    
                     { text: thaaliTblHeaders.THAALI_STATUS, datafield: 'status', renderer: columnsrenderer, cellsalign: 'center',  width: '15%', columntype: 'dropdownlist',
                         createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
                             // assign a new data source to the dropdownlist.
@@ -399,8 +399,7 @@ onLoadThaaliSchedule = function () {
                             // return the old value, if the new value is empty.
                             if (newvalue == "") return oldvalue;
                         }
-                    },
-                    { text: thaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDateEntered', renderer: columnsrenderer, width: '20%', cellsalign: 'center', editable: false, cellsformat: 'D'},
+                    },                    
                     { text: thaaliTblHeaders.VISIBLE, datafield: 'visible', renderer: columnsrenderer, cellsalign: 'center',   width: '10%', columntype: 'dropdownlist',
                         createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
                             // assign a new data source to the dropdownlist.
@@ -412,7 +411,8 @@ onLoadThaaliSchedule = function () {
                             // return the old value, if the new value is empty.
                             if (newvalue == "") return oldvalue;
                         }
-                    }
+                    },
+                    { text:  thaaliTblHeaders.INSTRUCTIONS, datafield: 'instructions', renderer: columnsrenderer, cellsalign: 'center',  width: '20%' }
                 ]
             });
             
@@ -690,7 +690,8 @@ onLoadThaaliSchedule = function () {
  */
 onLoadUserThaaliView = function(){
 	
-	var updatedRecordsArr = []; //Array that would hold the records that needs to be sent to the server.
+	var updatedRecords = {'updated':false}; //Array that would hold the records that needs to be sent to the server.
+	
 	
 	 //Initializing a popup window, we would need this to display any success/error messages.
 	$("#thaaliViewMsgPopup").jqxWindow({ width: '20%', height: '10%' , autoOpen:false, theme:themeName});
@@ -734,13 +735,13 @@ onLoadUserThaaliView = function(){
     getDataAdapter = function(source){
     	var dataAdapter = new $.jqx.dataAdapter(source,{
         	loadError: function(jqXHR, status, error){
-        		display(server_error_msg + error);
+        		display(server_error_msg);
         	},
         	//This method will get invoked when the data is returned from the server.
         	downloadComplete: function (edata, textStatus, jqXHR){
         		if(edata.error == true){
         			//An error has occurred.
-        			display(server_error_msg + edata.message);        			
+        			display(server_error_msg);        			
         		}
         	},
         	beforeLoadComplete: function (records){
@@ -804,8 +805,8 @@ onLoadUserThaaliView = function(){
 		}
 		
 		columnArr = [
-         { text: userThaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center',   width: cellWidth, editable: false },
-         { text: userThaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: cellWidth, cellsalign: 'center', editable: false, cellsformat: 'D'},            
+		 { text: userThaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: cellWidth, cellsalign: 'center', editable: false, cellsformat: 'D'},            
+         { text: userThaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center',   width: cellWidth, editable: false },                    
          { text: userThaaliTblHeaders.USER_THAALI_STATUS, datafield: 'userThaaliStatusUI', renderer: columnsrenderer, cellsalign: 'center',  width: cellWidth, columntype: 'dropdownlist',
          	cellsrenderer: function (row, columnfield, value, defaulthtml, columnproperties) {
          		// condition follows
@@ -935,6 +936,12 @@ onLoadUserThaaliView = function(){
         		//What if the date has been passed, this means user cannot update the record anymore.
         		// make sure the thaali date is a future date and not a past date.
         		var today = new Date();
+        		//reset todays date
+        		today.setHours(0);
+        		today.setMinutes(0);
+        		today.setSeconds(0);
+        		today.setMilliseconds(0);
+
         		if(rowData.thaaliDate < today){
         			msg = "Thaali Date has already been passed. No more changes are allowed.";
         			showMessage = true;
@@ -955,8 +962,9 @@ onLoadUserThaaliView = function(){
              }
         }else{
         	//Means everything is fine, user is allowed to modify the data.
-        	// update the array of dirty records to be sent to server for updation.
-        	updatedRecordsArr.push(rowData);
+        	// update the index of dirty records to be sent to server for updation.
+        	updatedRecords[row] = row;
+        	updatedRecords['updated'] = true
         }
      });
     
@@ -1027,38 +1035,44 @@ onLoadUserThaaliView = function(){
     /************ Insert in DB *******************************************/
     
     $("#submitUserDataButton").on('click', function () {    	
-    	var rowscount = $("#jqxUserThaaliDataGrid").jqxGrid('getdatainformation').rowscount;            	
-    	if(rowscount > 0 && updatedRecordsArr.length > 0){
+    	var rowscount = $("#jqxUserThaaliDataGrid").jqxGrid('getdatainformation').rowscount;         	
+    	if(rowscount > 0 && updatedRecords['updated']){
     		//Updating DB only when there is something to update.
     		var url=user_thaali_update_service_url;
     		var jsonData = new Object(); 
     		//Rows retrriedved from the grid.
-    		//var rows = $('#jqxUserThaaliDataGrid').jqxGrid('getrows');
+    		var rows = $('#jqxUserThaaliDataGrid').jqxGrid('getrows');
     		//Populating the json object..
     		var mRowArr =  new Array();
     		jsonData.eJamaatId = getEjamaatId();
     		jsonData.password = getPassword();
     		
-    		for(var i=0;i<updatedRecordsArr.length;i++){
-    			var record = updatedRecordsArr[i];
-    			//Creating a new user thaali data object.
-    			var userRecord = new Object();    			
+    		for(var i=0;i<rows.length;i++){
     			
-    			//This is done to show user a more use friendly thaali status rather than showing
-    			var mUserThaaliStatus = record.userThaaliStatusUI; //Thaali Status that might have been modified by the User
-    			
-    			
-    			//This is done to show user a more use friendly thaali status rather than showing
-    			for(var mapCnt=0;mapCnt<thaaliStatusMap.length;mapCnt++){
-    				if(thaaliStatusMap[mapCnt].status == "user_status" && thaaliStatusMap[mapCnt].displayName == mUserThaaliStatus){
-    					userRecord.userThaaliStatus = thaaliStatusMap[mapCnt].serverName;
-    				}    				
-    			}    			
-    			    			
-    			userRecord.thaaliDate = record.thaaliDate;
-    			userRecord.thaaliCategory = record.userThaaliCategory;    			
-    			userRecord.userThaaliDate = getFormattedDate(record.thaaliDate); //formatting the date before sending it out..    			
-    			mRowArr.push(userRecord);
+    			if(updatedRecords[i] == i){
+    				//Means record is dirty we need to update the server.
+    				
+    				var record = rows[i];
+        			//Creating a new user thaali data object.
+        			var userRecord = new Object();    			
+        			
+        			//This is done to show user a more use friendly thaali status rather than showing
+        			var mUserThaaliStatus = record.userThaaliStatusUI; //Thaali Status that might have been modified by the User
+        			
+        			
+        			//This is done to show user a more use friendly thaali status rather than showing
+        			for(var mapCnt=0;mapCnt<thaaliStatusMap.length;mapCnt++){
+        				if(thaaliStatusMap[mapCnt].status == "user_status" && thaaliStatusMap[mapCnt].displayName == mUserThaaliStatus){
+        					userRecord.userThaaliStatus = thaaliStatusMap[mapCnt].serverName;
+        				}    				
+        			}    			
+        			    			
+        			userRecord.thaaliDate = record.thaaliDate;
+        			userRecord.thaaliCategory = record.userThaaliCategory;    			
+        			userRecord.userThaaliDate = getFormattedDate(record.thaaliDate); //formatting the date before sending it out..    			
+        			mRowArr.push(userRecord);
+    			}
+
     		}
     		jsonData.dataList = mRowArr;
     		jsonData = JSON.stringify(jsonData);//we"ll have to stringify the object before sending it over the wire.
@@ -1076,7 +1090,7 @@ onLoadUserThaaliView = function(){
     			}
     		});
     	}
-    	updatedRecordsArr = []; //reset it to blank once everything is updated in the database.
+    	updatedRecords = {'updated':false}; //reset it to blank once everything is updated in the database.
     });
 	
 }
@@ -1112,7 +1126,8 @@ onLoadThaaliCount = function(){
        //json/xml doesn't matter
        datatype: "json",
        datafields: [         
-           { name: 'thaaliDate', type: 'date', format: 'yyyy-MM-dd'},    
+           { name: 'thaaliDate', type: 'date', format: 'yyyy-MM-dd'},
+           { name: 'totalNumOfThaalis', type:'string'},           
            { name: 'numOfSmallThaalis', type:'string'},
            { name: 'numOfMediumThaalis', type: 'string' },
            { name: 'numOfLargeThaalis', type: 'string' },
@@ -1127,13 +1142,13 @@ onLoadThaaliCount = function(){
    getDataAdapter = function(source){
    	var dataAdapter = new $.jqx.dataAdapter(source,{
        	loadError: function(jqXHR, status, error){
-       		display(server_error_msg + error);
+       		display(server_error_msg);
        	},
        	//This method will get invoked when the data is returned from the server.
        	downloadComplete: function (edata, textStatus, jqXHR){
        		if(edata.error == true){
        			//An error has occurred.
-       			display(server_error_msg + edata.message);
+       			display(server_error_msg);
        		}
        	}   	
        	
@@ -1170,12 +1185,13 @@ onLoadThaaliCount = function(){
        editable: true,
        pagesize: getPageSize(),
        columns: [
-           { text: getThaaliCountTblHdr().THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '25%', cellsalign: 'center', editable: false, cellsformat: 'D'},       
-           { text: getThaaliCountTblHdr().SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: getThaaliCountTblHdr().MEDIUM_THAALI, datafield: 'numOfMediumThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: getThaaliCountTblHdr().LARGE_THAALI, datafield: 'numOfLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: getThaaliCountTblHdr().JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
-           { text: getThaaliCountTblHdr().RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false }         
+           { text: getThaaliCountTblHdr().THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '23%', cellsalign: 'center', editable: false, cellsformat: 'D'}, 
+           { text: getThaaliCountTblHdr().TOTAL_THAALI, datafield: 'totalNumOfThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '12%', editable: false },
+           { text: getThaaliCountTblHdr().SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
+           { text: getThaaliCountTblHdr().MEDIUM_THAALI, datafield: 'numOfMediumThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
+           { text: getThaaliCountTblHdr().LARGE_THAALI, datafield: 'numOfLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
+           { text: getThaaliCountTblHdr().JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
+           { text: getThaaliCountTblHdr().RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false }         
            
        ]
    });
@@ -1305,14 +1321,14 @@ onLoadViewThaaliAll = function(){
    
    var dataAdapter = new $.jqx.dataAdapter(source,{
       	loadError: function(jqXHR, status, error){
-      		$("#msgContent").html(server_error_msg + error);
+      		$("#msgContent").html(server_error_msg);
           	$("#thaaliViewMsgPopup").jqxWindow('open');
       	},
       	//This method will get invoked when the data is returned from the server.
       	downloadComplete: function (edata, textStatus, jqXHR){
       		if(edata.error == true ){
       			//An error has occurred.
-      			$("#msgContent").html(server_error_msg + edata.message);
+      			$("#msgContent").html(server_error_msg);
               	$("#thaaliViewMsgPopup").jqxWindow('open');
       		}
       	},
@@ -1800,14 +1816,14 @@ onLoadUserFeedback = function(){
     getDataAdapter = function(source){
     	var dataAdapter = new $.jqx.dataAdapter(source,{
         	loadError: function(jqXHR, status, error){
-        		$("#feedbackMsgContent").html(server_error_msg + error);
+        		$("#feedbackMsgContent").html(server_error_msg);
             	$("#feedbackMsgPopup").jqxWindow('open');
         	},
         	//This method will get invoked when the data is returned from the server.
         	downloadComplete: function (edata, textStatus, jqXHR){
         		if(edata.error == true){
         			//An error has occurred.
-        			$("#feedbackMsgContent").html(server_error_msg + edata.message);
+        			$("#feedbackMsgContent").html(server_error_msg);
                 	$("#feedbackMsgPopup").jqxWindow('open');
         		}
         	}        	     	
@@ -1995,9 +2011,13 @@ toggle = function(activeId){
 	if(userRole == 'SUPER_USER'){
 		$('#thaaliInformation').attr('style','display: block; ');
 		$('#listThaaliSignups').attr('style','display: block; ');
+		$('#thaaliCount').attr('style','display: block; ');
 	}else if(userRole == "ADMIN"){
 		$('#thaaliInformation').attr('style','display: none; ');
 		$('#listThaaliSignups').attr('style','display: block; ');
+		$('#thaaliCount').attr('style','display: block; ');
+	}else if(userRole == "COOK"){
+		$('#thaaliCount').attr('style','display: block; ');		
 	}
 	
 	//If window is small enough, we need to disable the sidebar menu.
@@ -2393,7 +2413,7 @@ onLoadThaaliCalendar = function(){
 			}else{
 				if(thaaliData.instructions.toLowerCase().indexOf("open") >= 0 ){
 					//no thaali pakawnaar for this day, we need to highlight it..
-					title = "<i>Need Thaali Karnaar</i>";
+					title = "<i>"+thaaliData.menu +"<br/><i>Thaali Pakawanaar Needed.</i>";
 					bg = yellowBg;					
 				}else{
 					title ="<i>"+thaaliData.menu +"<br/><small>"+ thaaliData.instructions +"</small></i>";

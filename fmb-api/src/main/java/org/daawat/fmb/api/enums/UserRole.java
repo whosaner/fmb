@@ -2,7 +2,7 @@ package org.daawat.fmb.api.enums;
 
 public enum UserRole {
 	
-	USER("USER"), SUPER_USER("SUPER_USER"), ADMIN("ADMIN");
+	USER("USER"), SUPER_USER("SUPER_USER"), ADMIN("ADMIN"), COOK("COOK");
 
 	private String userRole;
 	private UserRole(String role){

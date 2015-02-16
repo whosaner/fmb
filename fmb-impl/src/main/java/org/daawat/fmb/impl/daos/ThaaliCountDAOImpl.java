@@ -48,6 +48,7 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 			thaaliCount.setNumOfSmallThaalis(small);
 			thaaliCount.setNumOfMediumThaalis(medium);
 			thaaliCount.setNumOfLargeThaalis(large);
+			thaaliCount.setTotalNumOfThaalis(small+medium+large);
 			thaaliCount.setThaaliDate(resultSet.getDate("THAALI_DATE"));
 			thaaliCount.setJamanQty(calculateJamanQty(small,medium,large));
 			

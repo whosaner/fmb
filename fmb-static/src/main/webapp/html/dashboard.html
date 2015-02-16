@@ -3,7 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta http-equiv="pragma" />
-        <title>Faiz Al-Mawaid AL-Burhaniyah | Dashboard</title>
+        <title>Faiz Al-Mawaid Al-Burhaniyah | Dashboard</title>
+        <link rel="shortcut icon" href="../img/logo.ico">
+        
         <meta content='width=device-width, initial-scale=1.0' name='viewport'>
         <!-- bootstrap 3.0.2 -->
         <link href="../adminlte/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
@@ -132,6 +134,11 @@
 				<ul class="sidebar-menu">
 					<li id="thaaliSignup"><a  onclick="toggle('thaaliSignup');"> <i class="fa fa-edit">  </i><span>Signup for Thaali</span>
 					</a></li>
+					<li id="thaaliCalendar"><a  onclick="toggle('thaaliCalendar');"> <i class="fa fa-calendar"></i>Thaali Calendar</a></li>
+					<li id="submitFeedback"><a  onclick="toggle('submitFeedback');"> <i class="fa fa-comments-o"></i>Submit Feedback	</a></li>					
+					<li id="userProfile"><a  onclick="toggle('userProfile');"> <i class="fa fa-user"></i>User Profile</a></li>
+					<li style="display:none;" id="thaaliCount"><a  onclick="toggle('thaaliCount');"> <i class="fa fa-tasks"></i>Thaali Count</a></li>
+					<li style="display:none;" id="listThaaliSignups"><a  onclick="toggle('listThaaliSignups');"> <i class="fa fa-list"></i>List Thaali Signups</a></li>
 					<li style="display:none;" class="treeview" id="thaaliInformation" >
                             <a href="#">
                                 <i class="fa fa-list"></i>
@@ -145,13 +152,6 @@
                                 <li id="viewFeedback"><a href="#"  onclick="toggle('viewFeedback');"> <i class="fa fa-comments"></i>View Feedback</a></li>
                             </ul>
                    </li>
-                        
-					<li style="display:none;" id="listThaaliSignups"><a  onclick="toggle('listThaaliSignups');"> <i class="fa fa-list"></i>List Thaali Signups</a></li>
-					<li id="userProfile"><a  onclick="toggle('userProfile');"> <i class="fa fa-user"></i>User Profile</a></li>
-					<li id="submitFeedback"><a  onclick="toggle('submitFeedback');"> <i class="fa fa-comments-o"></i>Submit Feedback	</a></li>
-					<li id="thaaliCalendar"><a  onclick="toggle('thaaliCalendar');"> <i class="fa fa-calendar"></i>Thaali Calendar</a></li>
-					<li id="thaaliCount"><a  onclick="toggle('thaaliCount');"> <i class="fa fa-tasks"></i>Thaali Count</a></li>
-					
 				</ul>
 			</section>
 			<!-- /.sidebar -->
@@ -171,6 +171,15 @@
 			<!-- /.content -->
 		</aside>
 		<!-- /.right-side -->
+	</div>
+
+	<div id="footer">
+		<div class="container">
+			<p class="text-muted" align="center">
+				<small> For any issues with the website please contact the <a  href="mailto:hussain_rangwala@yahoo.com">
+      Webmaster</a></small>
+			</p>
+		</div>
 	</div>
 	<!-- ./wrapper -->
 	

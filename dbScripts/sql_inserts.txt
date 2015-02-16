@@ -4,7 +4,7 @@ INSERT INTO `USER_PROFILE_TBL` VALUES
 ('20357702','20357702','20357702','Paghdiwala','Fatema bai Shabbir bhai ','USER','Small',22,'West Chester'),
 ('20357703','20357703','20357703','Mun','Shaikh Qasim bhai','ADMIN','Small',2,'West Chester'),
 ('30464507','30464507','20357703','Mun','Huzaifa bhai Shaikh Qasim bhai ','ADMIN','Small',14,'Philadelphia'),
-('30464506','30464506','20357703','Mun','Nisreen bai Shaikh Qasim bhai','USER','Small',2,'West Chester'),
+('30464506','30464506','20357703','Mun','Nisreen bai Shaikh Qasim bhai','COOK','Small',2,'West Chester'),
 ('30464509','30464509','20357703',' Mun','Taher bhai Shaikh Qasim bhai','ADMIN','Small',2,'West Chester'),
 ('30464510','30464510','20357703','Mun','Fatema bai Shaikh Qasim bhai ','USER','Small',2,'West Chester'),
 ('20357704','20357704','20357704',' Hassonjee','Shaikh Qaizar bhai','USER','Medium',4,'Delaware'),
@@ -13,7 +13,7 @@ INSERT INTO `USER_PROFILE_TBL` VALUES
 ('30603259','30603259','20357704','Hassonjee','Murtaza bhai Shaikh Qaizar bhai ','USER','Medium',4,'Delaware'),
 ('20357705','20357705','20357705','Merchant','Shaikh Abid bhai','USER','Small',5,'Delaware'),
 ('30464516','30464516','20357705','Merchant','Alifiya bai Shaikh Abid bhai ','USER','Small',5,'Delaware'),
-('30464514','30464514','20357705','Merchant','Khairunnisa bai Shaikh Abid bhai ','USER','Small',5,'Delaware'),
+('30464514','30464514','20357705','Merchant','Khairunnisa bai Shaikh Abid bhai ','COOK','Small',5,'Delaware'),
 ('20357708','20357708','20357708','Amiji','Mulla Saifuddin bhai','ADMIN','Small',7,'West Chester'),
 ('30464527','30464527','20357708','Amiji','Azra bai Mulla Saifuddin bhai ','USER','Small',7,'West Chester'),
 ('30603261','30603261','20357708','Amiji','Fatema bai Mulla Saifuddin bhai ','USER','Small',7,'West Chester'),
@@ -25,18 +25,18 @@ INSERT INTO `USER_PROFILE_TBL` VALUES
 ('20375951','20375951','20375951','Zafar','Adnan bhai','ADMIN','Small',19,'Delaware'),
 ('20395627','20395627','20395627','Chinwala','Juzer bhai','USER','Medium',20,'Delaware'),
 ('50483345','50483345','20395627','Chinwala','Mariyah bai Juzer bhai ','USER','Medium',20,'West Chester'),
-('50483329','50483329','20395627','Chinwala','Durriya bai Juzer bhai ','USER','Medium',20,'West Chester'),
+('50483329','50483329','20395627','Chinwala','Durriya bai Juzer bhai ','COOK','Medium',20,'West Chester'),
 ('50483330','50483330','20395627','Chinwala','Hasnain bhai Juzer bhai ','ADMIN','Medium',20,'West Chester'),
 ('30308655','30308655','30308655','Rangwala','Hussain bhai','SUPER_USER','Medium',18,'West Chester'),
-('30322552','30322552','30308655','Rangwala','Khadija bai Husain bhai ','USER','Medium',18,'West Chester'),
+('30322552','30322552','30308655','Rangwala','Khadija bai Husain bhai ','COOK','Medium',18,'West Chester'),
 ('30469249','30469249','30469249','Manasawala','Mulla Mohammed bhai','ADMIN','Small',8,'King Of Prussia'),
 ('30440354','30440354','30469249','Manasawala','Zainab bai Mulla Mohammed bhai ','USER','Small',8,'King Of Prussia'),
 ('30603265','30603265','30603265','Khambaty','Mulla Adnan bhai','SUPER_USER','Medium',9,'Delaware'),
-('30395536','30395536','30603265','Khambaty','Fatema bai Mulla Adnan bhai ','USER','Medium',9,'Delaware'),
+('30395536','30395536','30603265','Khambaty','Fatema bai Mulla Adnan bhai ','COOK','Medium',9,'Delaware'),
 ('30603266','30603266','30603266','Dohadwala','Mulla Mohammed bhai','ADMIN','Medium',10,'Delaware'),
-('30603267','30603267','30603266','Dohadwala','Zainab bai Mulla Mohammed bhai ','USER','Medium',10,'Delaware'),
-('30701232','30701232','30701232','Kothari','Yusuf bhai','SUPER_USER','Medium',11,'Delaware'),
-('30701233','30701233','30701232','Kothari','Umaima bai Yusuf bhai ','USER','Medium',11,'Delaware'),
+('30603267','30603267','30603266','Dohadwala','Zainab bai Mulla Mohammed bhai ','COOK','Medium',10,'Delaware'),
+('30701232','30701232','30701232','Kothari','Yusuf bhai','ADMIN','Medium',11,'Delaware'),
+('30701233','30701233','30701232','Kothari','Umaima bai Yusuf bhai ','COOK','Medium',11,'Delaware'),
 ('30701235','30701235','30701235','Bookbinder','Saifuddin bhai','USER','Medium',12,'King Of Prussia'),
 ('30701239','30701239','30701235','Bookbinder','Tasneem bai Saifuddin bhai ','USER','Medium',12,'King Of Prussia'),
 ('30701238','30701238','30701235','Bookbinder','Sakina bai Saifuddin bhai ','USER','Medium',12,'King Of Prussia'),
@@ -60,4 +60,4 @@ INSERT INTO FMB.`THAALI_COOK_TBL` VALUES
 ('Kherun ben Merchant'),('Azra ben Amiji');
 
 
-
+update FMB.USER_PROFILE_TBL set USER_ROLE="COOK" where EJAMAAT_ID IN ("30395536", "30440354", "30464506", "30464514", "30603267", "30701233", "50483329");

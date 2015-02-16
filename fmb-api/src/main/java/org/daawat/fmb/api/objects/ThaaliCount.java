@@ -16,6 +16,7 @@ public class ThaaliCount implements Serializable{
 	private int numOfSmallThaalis;
 	private int numOfMediumThaalis;
 	private int numOfLargeThaalis;
+	private int totalNumOfThaalis;
 	private Date thaaliDate;
 	private int jamanQty; //in quarts
 	private int numOfRiceCups; //size of 8 oz cups;
@@ -62,6 +63,12 @@ public class ThaaliCount implements Serializable{
 	}
 	public void setInstructions(String instructions) {
 		this.instructions = instructions;
+	}
+	public int getTotalNumOfThaalis() {
+		return totalNumOfThaalis;
+	}
+	public void setTotalNumOfThaalis(int totalNumOfThaalis) {
+		this.totalNumOfThaalis = totalNumOfThaalis;
 	}
 	
 	
