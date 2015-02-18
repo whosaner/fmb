@@ -66,6 +66,7 @@ CREATE TABLE `USER_PROFILE_TBL` (
   `THAALI_CATEGORY` varchar(12) NOT NULL,
   `FAMILY_GROUP_ID` int(11) NOT NULL,
   `USER_LOCATION` varchar(45) NOT NULL,
+  `EMAIL_ADDRESSES` varchar(250),
   PRIMARY KEY (`EJAMAAT_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='This table will hold the profile information of the user.';
 

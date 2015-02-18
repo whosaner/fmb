@@ -25,6 +25,7 @@ public class UserProfileData implements Serializable{
 	//A group if which will be unique for all the members in a family. 
 	//This is needed to club a particular family member to a specific group.
 	private int familyGroupId;
+	private String emailAddresses = ""; //Comma separated list of email address.
 
 	
 
@@ -125,6 +126,17 @@ public class UserProfileData implements Serializable{
 	public void setLocation(String location) {
 		this.location = location;
 	}
+	
+	public String getEmailAddresses() {
+		if(emailAddresses == null){
+			return "";
+		}
+		return emailAddresses;
+	}
+
+	public void setEmailAddresses(String emailAddresses) {
+		this.emailAddresses = emailAddresses;
+	}
 
 	public List<Object> toList_Insert(){
 		List<Object> objList = new ArrayList<Object>();
@@ -136,6 +148,7 @@ public class UserProfileData implements Serializable{
 		objList.add(thaaliCategory.getValue());
 		objList.add(familyGroupId);
 		objList.add(location);
+		objList.add(emailAddresses);
 		return objList;
 		
 	}
@@ -146,7 +159,8 @@ public class UserProfileData implements Serializable{
 		objList.add(familyName);
 		objList.add(firstName);
 		objList.add(thaaliCategory.getValue());
-		objList.add(location);		
+		objList.add(location);
+		objList.add(emailAddresses);
 		objList.add(userCredentials.geteJamaatId());
 		objList.add(userCredentials.getPassword());
 		return objList;
@@ -159,9 +173,11 @@ public class UserProfileData implements Serializable{
 				+ ", hofEJamaatId=" + hofEJamaatId + ", familyName="
 				+ familyName + ", firstName=" + firstName + ", userRole="
 				+ userRole + ", thaaliCategory=" + thaaliCategory
-				+ ", location=" + location + ", familyGroupId=" + familyGroupId
+				+ ", location=" + location + ", emailAddresses=" + emailAddresses + ", familyGroupId=" + familyGroupId
 				+ "]";
 	}
+
+	
 	
 	
 }

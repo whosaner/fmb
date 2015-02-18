@@ -92,6 +92,7 @@ public class UserProfileDataDAOImpl extends BaseJDBCDAO<UserProfileData> impleme
 			userProfileData.setThaaliCategory(Category.getEnum(resultSet.getString("THAALI_CATEGORY")));
 			userProfileData.setFamilyGroupId(resultSet.getInt("FAMILY_GROUP_ID"));
 			userProfileData.setLocation(resultSet.getString("USER_LOCATION"));
+			userProfileData.setEmailAddresses(resultSet.getString("EMAIL_ADDRESSES"));
 			userProfileData.setUserCredentials(ucd);
 			userProfileDataList.add(userProfileData);
 		}

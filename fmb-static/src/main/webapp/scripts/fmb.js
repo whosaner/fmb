@@ -21,6 +21,7 @@ var add_region_service_url=server_url+"/admin/addRegion";
 var user_feedback_service_url=server_url+"/admin/getFeedback";
 var all_user_profile_service_url=server_url+"/admin/getAllUserProfileData";
 var profile_create_service_url = server_url+"/admin/createProfile";
+var sendEmail_url=server_url+"/sendEmail";
 
 //User specific services
 var user_thaali_update_service_url = server_url+"/user/updateThaaliData";
@@ -99,7 +100,7 @@ var dat_diff_msg = "The difference between from date and to date cannot be more 
 
 //Items that are present on the dashboard.
 var userDashboardArr = [["thaaliSignup","thaaliSignup.html"],["userProfile","userProfile.html"],["rotiKhidmat","rotiKhidmat.html"],["submitFeedback","submitFeedback.html"],["notification","notification.html"],["thaaliSchedule","thaaliSchedule.html"],
-                        ["listThaaliSignups","listThaaliSignups.html"],["registerNewUser","registerNewUser.html"],["addMenu","addMenu.html"],["thaaliInformation","thaaliSchedule.html"],["viewFeedback","viewFeedback.html"],["thaaliCalendar","thaaliCalendar.html"],["thaaliCount","thaaliCount.html"]];
+                        ["listThaaliSignups","listThaaliSignups.html"],["registerNewUser","registerNewUser.html"],["addMenu","addMenu.html"],["thaaliInformation","thaaliSchedule.html"],["viewFeedback","viewFeedback.html"],["thaaliCalendar","thaaliCalendar.html"],["thaaliCount","thaaliCount.html"], ["sendMail","sendMail.html"]];
 
 //Related to the Visible functionality.
 var visible_to_users=["Yes","No"];
@@ -1695,6 +1696,43 @@ onLoadRegisterNewUser = function(){
 /********************************************   User Profile Functionality starts here ***************************************************************************************/
 
 
+validateUserProfileForm = function(){
+	
+	jQuery.validator.addMethod("multiemails", function(value, element) {
+		if (this.optional(element)) // return true on optional element
+			return true;
+		var emails = value.split(/[,]+/); // split element by ,
+		valid = true;
+		for ( var i in emails) {
+			value = emails[i];
+			valid = valid
+					&& jQuery.validator.methods.email.call(this, $.trim(value),
+							element);
+		}
+		return valid;
+	}, jQuery.validator.messages.multiemails);
+	
+    $('#userProfileForm').validate({
+	    rules: {
+	    	emailIp: {
+                required: true,
+                multiemails: true
+            }         
+	    },
+	    
+	    highlight: function(element) {
+	        $(element).closest('.form-group').removeClass('success').addClass('has-error');
+	    },
+	    
+	    messages: {
+	    	emailIp: {
+	    		required: "Please enter a valid email address",
+	    		multiemails: "Please enter a valid email address"
+	    	}	    	
+		}
+	});
+}
+
 onLoadUserProfile = function(){
 	
 	//We need to get the user profile data and populate it in the UserProfileForm.
@@ -1737,6 +1775,7 @@ onLoadUserProfile = function(){
 			$('#tCategory').val(userProfileObj.thaaliCategory);
 			$('#tDelivery').val(userProfileObj.location);
 			$('#userRole').val(userProfileObj.userRole);
+			$('#emailIp').val(userProfileObj.email);
 		}else{
 			dataObj.error = true;
 			isError(dataObj);
@@ -1744,37 +1783,49 @@ onLoadUserProfile = function(){
 	}
 	
 	   //We need to save the changes in the database, once the user decides to save the changes.
-	   $('#userProfileSubmit').on('click', function () {
-		    var ejamaatId = $('#ejamaatId').val();
+	   $('#userProfileSubmit').on('click', function() {
+		// We need to validate the feedback form before submitting it.
+		validateUserProfileForm();
+
+		var isValid = $('#userProfileForm').valid();
+		if (isValid) {
+			// reset the error classes..
+			$('div').removeClass('has-error');
+
+			var ejamaatId = $('#ejamaatId').val();
 			var hofEjmaatId = $('#hofEjamaatId').val();
 			var firstName = $('#firstName').val();
 			var familyName = $('#familyName').val();
 			var tCategory = $('#tCategory').val();
 			var tDelivery = $('#tDelivery').val();
 			var userRole = $('#userRole').val();
-			
-	       //Need to call the ajax service to update the data.  
-		   var userProfileUpdatedObj = {
-			   "userCredentials":{"eJamaatId":ejamaatId,"password":getPassword()},
-			   "hofEJamaatId":hofEjmaatId,
-			   "familyName":familyName,
-			   "firstName":firstName,
-			   "location":tDelivery,
-			   "thaaliCategory":tCategory,
-			   "userRole":userRole
-		    };
-		   
-		   var jsonStr = JSON.stringify(userProfileUpdatedObj);
-		   
-		   var updateUrl = profile_update_service_url;
-		   dataObj = handleAjax("POST",updateUrl,jsonStr); 
-		   if(!isError(dataObj)){
-			   //display success popup..
-			   $('#profileSuccessCallout').show();	
-			   $('#profileErrorCallout').hide();
-		   }
-		   return false;//need to always return false.
-	   });
+
+			// Need to call the ajax service to update the data.
+			var userProfileUpdatedObj = {
+				"userCredentials" : {
+					"eJamaatId" : ejamaatId,
+					"password" : getPassword()
+				},
+				"hofEJamaatId" : hofEjmaatId,
+				"familyName" : familyName,
+				"firstName" : firstName,
+				"location" : tDelivery,
+				"thaaliCategory" : tCategory,
+				"userRole" : userRole
+			};
+
+			var jsonStr = JSON.stringify(userProfileUpdatedObj);
+
+			var updateUrl = profile_update_service_url;
+			dataObj = handleAjax("POST", updateUrl, jsonStr);
+			if (!isError(dataObj)) {
+				// display success popup..
+				$('#profileSuccessCallout').show();
+				$('#profileErrorCallout').hide();
+			}
+		}
+		return false;// need to always return false.
+	});
 	   
 	  
 
@@ -2469,39 +2520,115 @@ onLoadThaaliCalendar = function(){
 }
 
 
-/*
-beforeLoadComplete: function (records,oData){
-		var pivotTable = new Array();
-		//We need to pivot the table based on the size of the window.
-		if(oData != null && oData.dataList != null){
-			records = oData.dataList;      			
-  		for (var i = 0; i < records.length; i++) {
-  			var oRecord = records[i];
-  			//Each record needs to be pivoted into the below records.
-  			var pivotRecords = [{columnName:"Menu",columnValue:''},
-  								{columnName:"Thaali Date",columnValue:''},
-  								{columnName:"Thaali Requested",columnValue:''}
-  								{columnName:"Category",columnValue:''}];          			 
-  			//We need to convert this one record into multiple records. Since we need to pivot the table.
-  			pivotRecords[0].columnValue = oRecord.menu;
-  			pivotRecords[1].columnValue = oRecord.thaaliDate;          			
-  			
-  		    //This is done to show user a more use friendly thaali status rather than showing
-			var userStatus = oRecord.userThaaliStatus;    			
-			if(userStatus == user_thaali_status[0]){
-				//requested by user
-				userStatus = user_thaali_status_ui[0];
-			}else{
-				//not requested by user
-				userStatus = user_thaali_status_ui[1];
-			}
-			pivotRecords[2].columnValue = userStatus;
-			pivotRecords[3].columnValue = userThaaliCategory;
-			//Adding all together.
-			pivotTable = pivotTable.concat(pivotRecords);
-  		}
+/****************** Email functionality ****************************/
 
+validateEmailForm = function(){
+	
+    $('#emailForm').validate({
+	    rules: {
+	    	subject: {
+                required: true
+            },
+            messageBody: {
+                required: true
+            },
+            mailToType: {
+            	required: true
+            }
+	    },
+	    
+	    highlight: function(element) {
+	        $(element).closest('.form-group').removeClass('success').addClass('has-error');
+	    },
+	    
+	    messages: {
+	    	subject: {
+	    		required: "Please enter a Subject for the email."
+	    	},	    	
+	    	messageBody: {
+	    		required: "Message body cannot be blank."
+	    	},
+	    	mailToType: {
+	    		required: "Please select an email recipient."
+	    	}
 		}
-		return pivotTable;
-	}   
-*/
+	});
+}
+
+sendEmail = function() {
+	$('#sendEmail').on('click', function() {
+
+		// We need to validate the feedback form before submitting it.
+		validateEmailForm();
+
+		var isValid = $('#emailForm').valid();
+		if (isValid) {
+			// reset the error classes..
+			$('div').removeClass('has-error');
+
+			var subject = $('#subject').val();
+			var message = $('#messageBody').val();
+			var mailToType = $('#mailToType').val();
+
+			// Need to send the data over the wire to be saved in the db.
+			var jsonData = {};
+			jsonData.eJamaatId = getEjamaatId();
+			jsonData.password = getPassword();
+
+			var email = {
+				body : message,
+				bodyContentType : "text/html",
+				subject : subject,
+				mailTo : mailToType
+			};
+
+			// Creating an array of feedback, since the server accepts the data
+			// as a
+			// list.
+			var emails = new Array();
+			emails.push(email);
+
+			jsonData.dataList = emails;
+			var jsonStr = JSON.stringify(jsonData);
+
+			var url = sendEmail_url;
+			var dataObj = handleAjax("POST", url, jsonStr);
+			if (!dataObj.error) {
+				// display success popup..
+				$('#emailErrorCallout').hide();
+				$('#emailSuccessCallout').show();
+
+			} else {
+				$('#emailErrorCallout').show();
+				$('#emailSuccessCallout').hide();
+			}
+		}
+
+		return false;// need to always return false.
+	});
+}
+
+
+
+/*
+ * beforeLoadComplete: function (records,oData){ var pivotTable = new Array();
+ * //We need to pivot the table based on the size of the window. if(oData !=
+ * null && oData.dataList != null){ records = oData.dataList; for (var i = 0; i <
+ * records.length; i++) { var oRecord = records[i]; //Each record needs to be
+ * pivoted into the below records. var pivotRecords =
+ * [{columnName:"Menu",columnValue:''}, {columnName:"Thaali
+ * Date",columnValue:''}, {columnName:"Thaali Requested",columnValue:''}
+ * {columnName:"Category",columnValue:''}]; //We need to convert this one record
+ * into multiple records. Since we need to pivot the table.
+ * pivotRecords[0].columnValue = oRecord.menu; pivotRecords[1].columnValue =
+ * oRecord.thaaliDate;
+ * 
+ * //This is done to show user a more use friendly thaali status rather than
+ * showing var userStatus = oRecord.userThaaliStatus; if(userStatus ==
+ * user_thaali_status[0]){ //requested by user userStatus =
+ * user_thaali_status_ui[0]; }else{ //not requested by user userStatus =
+ * user_thaali_status_ui[1]; } pivotRecords[2].columnValue = userStatus;
+ * pivotRecords[3].columnValue = userThaaliCategory; //Adding all together.
+ * pivotTable = pivotTable.concat(pivotRecords); }
+ *  } return pivotTable; }
+ */
