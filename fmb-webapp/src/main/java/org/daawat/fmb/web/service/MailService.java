@@ -35,7 +35,7 @@ import org.daawat.fmb.utils.PropertyFileManager;
 @Path("/sendEmail")
 public class MailService extends BaseService{
 	private static final String COMP_NAME = MailService.class.getName();
-
+	
 	@POST	
 	@Consumes(MediaType.APPLICATION_JSON)	
 	@Produces({MediaType.APPLICATION_XML,MediaType.APPLICATION_JSON})
@@ -63,14 +63,17 @@ public class MailService extends BaseService{
 		final String password = PropertyFileManager.getProperty("mail.password");
 		final String headerImg = PropertyFileManager.getProperty("mail.header.img");
 		final String footer = PropertyFileManager.getProperty("mail.footer");
-		final String subject = msg.getSubject();
+		final String subject = PropertyFileManager.getProperty("mail.subject.prefix") + msg.getSubject();
 		final String htmlMsgBody = msg.getBody();
 		final String contentType = msg.getBodyContentType();
 		final MailToType mailToType = msg.getMailTo();
 		
+		StringBuffer emailAddresses = new StringBuffer();
+		StringBuffer messageContent = new StringBuffer();
+		
 		UserProfileDataDAO userProfileDAO = new UserProfileDataDAOImpl();
 		List<UserProfileData> userProfiles = userProfileDAO.getAllUserProfileData();
-		StringBuffer emailAddresses = new StringBuffer();
+		
 		
 		for(UserProfileData userProfile: userProfiles){
 			if(MailToType.JAMAAT.equals(mailToType)){
@@ -87,7 +90,7 @@ public class MailService extends BaseService{
 			}
 		}
 		
-				
+		
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
@@ -111,16 +114,18 @@ public class MailService extends BaseService{
 			message.setSubject(subject);
 			//Add custom header
 			if(headerImg != null){
-				message.setContent("<img src=\""+headerImg+"\">",contentType);
+				messageContent.append("<img src=\""+headerImg+"\">");
 			}			
 			//Add body
-			message.setContent(htmlMsgBody,contentType);
+			messageContent.append(htmlMsgBody);
 			//Add custom footer
-			message.setContent(footer,contentType);
+			messageContent.append(footer);
+			
+			message.setContent(messageContent.toString(), contentType);
 			
 			Transport.send(message);
  
-			System.out.println("Done");
+			Logger.info(COMP_NAME, "Successfully emailed to "+emailAddresses);
  
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);

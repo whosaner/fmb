@@ -115,6 +115,7 @@ var welcomeMessage = "Baad Salam-il Jameel, ";
 var columnsHeight= 60;
 
 var mobile_view_screen_size = 992;
+
 /**
  * A generic method which will do a ajax call depending upon the input params.
  * @param methodType
@@ -1507,6 +1508,20 @@ validateRegisterUserForm = function(){
 		return this.optional(element) || /^[a-z," "]+$/i.test(value);
 	}, "Name cannot contain numbers.");
 	
+	jQuery.validator.addMethod("multiemails", function(value, element) {
+		if (this.optional(element)) // return true on optional element
+			return true;
+		var emails = value.split(/[,]+/); // split element by ,
+		valid = true;
+		for ( var i in emails) {
+			value = emails[i];
+			valid = valid
+					&& jQuery.validator.methods.email.call(this, $.trim(value),
+							element);
+		}
+		return valid;
+	}, jQuery.validator.messages.multiemails);
+	
 	// validating the form using the jquery.validate plugin
 	$('#registerNewUserForm').validate({
 	    rules: {
@@ -1515,19 +1530,20 @@ validateRegisterUserForm = function(){
 	            maxlength: 8,
 	            required: true,
 	            digits:true
-	        },
-	        
+	        },	        
 	        hofEjamaatId: {
 	            minlength: 8,
 	            maxlength: 8,
 	            digits:true
-	        },
-	        
+	        },	        
 	        firstName: {
 	            required:true,
 	            lettersonly:true
 	        },
-	        
+	        emailAdd: {
+	            required:true,
+	            multiemails:true
+	        },   	        
 	        familyName:{
 	        	required:{
 	        		depends:function(element){
@@ -1535,8 +1551,7 @@ validateRegisterUserForm = function(){
 	        		}
 	        	},
 	        	lettersonly:true
-	        },
-	        
+	        },	        
 	        familyGroupId:{
 	        	required:function(element) {
 	        		return $('#radioExistingFamily').is(':checked');
@@ -1571,7 +1586,11 @@ validateRegisterUserForm = function(){
 	    	},
 	    	familyGroupId:{
 	        	required:"Please select a family for the user."
-	        }
+	        },
+	    	emailAdd:{
+	    		required:"Email Address is required.",
+	    		multiemails:"Please enter a valid email address. Multiple email address can be separated by a comma."
+	    	}
 		}
 	});
 }
@@ -1645,6 +1664,7 @@ onLoadRegisterNewUser = function(){
 				var tCategory = $('#tCategory').val();
 				var tDelivery = $('#tDelivery').val();
 				var userRole = $('#userRole').val();
+				var emailAddress = $('#emailAdd').val();
 				var familyGroupId = 0;
 				
 				if($('#radioNewFamily').is(':checked')){
@@ -1666,7 +1686,8 @@ onLoadRegisterNewUser = function(){
 				   "location":tDelivery,
 				   "thaaliCategory":tCategory,
 				   "userRole":userRole,
-				   "familyGroupId":familyGroupId
+				   "familyGroupId":familyGroupId,
+				   "emailAddresses":emailAddress
 			    };
 			   
 			   var userProfileArr = new Array();
@@ -1697,22 +1718,8 @@ onLoadRegisterNewUser = function(){
 
 
 validateUserProfileForm = function(){
-	
-	jQuery.validator.addMethod("multiemails", function(value, element) {
-		if (this.optional(element)) // return true on optional element
-			return true;
-		var emails = value.split(/[,]+/); // split element by ,
-		valid = true;
-		for ( var i in emails) {
-			value = emails[i];
-			valid = valid
-					&& jQuery.validator.methods.email.call(this, $.trim(value),
-							element);
-		}
-		return valid;
-	}, jQuery.validator.messages.multiemails);
-	
-    $('#userProfileForm').validate({
+
+	$('#userProfileForm').validate({
 	    rules: {
 	    	emailIp: {
                 required: true,
@@ -1775,7 +1782,7 @@ onLoadUserProfile = function(){
 			$('#tCategory').val(userProfileObj.thaaliCategory);
 			$('#tDelivery').val(userProfileObj.location);
 			$('#userRole').val(userProfileObj.userRole);
-			$('#emailIp').val(userProfileObj.email);
+			$('#emailIp').val(userProfileObj.emailAddresses);
 		}else{
 			dataObj.error = true;
 			isError(dataObj);
@@ -1799,6 +1806,7 @@ onLoadUserProfile = function(){
 			var tCategory = $('#tCategory').val();
 			var tDelivery = $('#tDelivery').val();
 			var userRole = $('#userRole').val();
+			var emailAddress = $('#emailIp').val();
 
 			// Need to call the ajax service to update the data.
 			var userProfileUpdatedObj = {
@@ -1811,7 +1819,8 @@ onLoadUserProfile = function(){
 				"firstName" : firstName,
 				"location" : tDelivery,
 				"thaaliCategory" : tCategory,
-				"userRole" : userRole
+				"userRole" : userRole,
+				"emailAddresses":emailAddress
 			};
 
 			var jsonStr = JSON.stringify(userProfileUpdatedObj);
