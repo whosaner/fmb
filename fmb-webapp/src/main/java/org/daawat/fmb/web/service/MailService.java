@@ -10,7 +10,9 @@ import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -50,7 +52,7 @@ public class MailService extends BaseService{
 			authenticateUser(eJamaatId, password);
 			prepareToSendEmail(requestObj.getDataList().get(0));
 		}catch(Exception e){
-			msg += "An exception occurred while updating UserThaaliData for the user with the ejamaatid - "+eJamaatId+", stacktrace is "+e;
+			msg += "An exception occurred while sending email, stacktrace is "+e;
 			Logger.error(COMP_NAME,msg);
 			isError = true;
 		}
@@ -69,7 +71,7 @@ public class MailService extends BaseService{
 		final MailToType mailToType = msg.getMailTo();
 		
 		StringBuffer emailAddresses = new StringBuffer();
-		StringBuffer messageContent = new StringBuffer();
+		StringBuffer htmlMsgContent = new StringBuffer();
 		
 		UserProfileDataDAO userProfileDAO = new UserProfileDataDAOImpl();
 		List<UserProfileData> userProfiles = userProfileDAO.getAllUserProfileData();
@@ -107,25 +109,45 @@ public class MailService extends BaseService{
  
 		try {
  
+			MimeMultipart content = new MimeMultipart("related");
+			String contentId = "fm-logo-001";
+			
+			htmlMsgContent.append("<html><body>");
+			//Add custom header image
+			if(headerImg != null){
+				htmlMsgContent.append("<img src=\"cid:"+contentId+"\" />");
+				
+				//Attaching image as inline
+				MimeBodyPart imagePart = new MimeBodyPart();				
+				imagePart.attachFile(headerImg);
+				imagePart.setContentID("<" + contentId + ">");
+				imagePart.setDisposition(MimeBodyPart.INLINE);
+				content.addBodyPart(imagePart);
+				
+			}
+			
+			//Message Body
+			htmlMsgContent.append(htmlMsgBody);
+			//Add custom footer
+			htmlMsgContent.append(footer);
+			htmlMsgContent.append("</body></html>");
+			
+			//Body part
+			MimeBodyPart htmlPart = new MimeBodyPart();
+			htmlPart.setText(htmlMsgContent.toString(), "UTF-8", "html");
+			//adding it back to the content.
+			content.addBodyPart(htmlPart);
+			
+			//send the message			
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(PropertyFileManager.getProperty("mail.email.from")));
 			message.setRecipients(Message.RecipientType.TO,
 				InternetAddress.parse(emailAddresses.toString(), false));
-			message.setSubject(subject);
-			//Add custom header
-			if(headerImg != null){
-				messageContent.append("<img src=\""+headerImg+"\">");
-			}			
-			//Add body
-			messageContent.append(htmlMsgBody);
-			//Add custom footer
-			messageContent.append(footer);
-			
-			message.setContent(messageContent.toString(), contentType);
-			
+			message.setSubject(subject);			
+			message.setContent(content);			
 			Transport.send(message);
  
-			Logger.info(COMP_NAME, "Successfully emailed to "+emailAddresses);
+			Logger.info(COMP_NAME, "Successfully emailed to "+emailAddresses+"Message Content is -"+htmlMsgContent.toString());
  
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
