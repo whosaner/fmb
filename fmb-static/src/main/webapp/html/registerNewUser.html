@@ -1,0 +1,103 @@
+	  <div class="row">
+	   <div class="col-md-6">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title">Register a new user in the system</h3>
+			</div>             
+				<form role="form" id="registerNewUserForm" action="#" method="post">
+					<div class="box-body">
+						<div class="callout callout-danger" id="registerUserErrorCallout" style="display:none;">
+							<h4>An error has occurred!</h4>
+							<p>There is a problem with the system right now. Please try
+								again later, if the problem still persists, please contact the
+								system administrator.</p>
+						</div>
+						<div class="callout callout-info" id="registerUserSuccessCallout"
+							style="display: none;">
+							<h4>Success!</h4>
+							<p>New User have been successfully added in the system.</p>
+						</div>
+
+						<div class="form-group">
+							<input type="text" name="ejamaatId" id="ejamaatId"
+								class="form-control" placeholder="EJamaat ID" />
+						</div>
+						<div class="form-group">
+							<input type="text" name="hofEjamaatId" id="hofEjamaatId"
+								class="form-control" placeholder="HOF EJamaat ID" />
+						</div>
+						<div class="form-group">
+							<input type="text" name="firstName" id="firstName"
+								class="form-control" placeholder="First Name" />
+						</div>
+						<div class="form-group">
+							<input type="text" name="emailAdd" id="emailAdd"
+								class="form-control" placeholder="Email Address" />
+						</div>
+						
+						<div class="form-group">
+							<label for="userRoleLabel">User Role</label> <select
+								id="userRole" class="form-control">
+								<option value="USER">User</option>
+								<option value="ADMIN">User (Khidmat Guzaar)</option>
+								<option value="COOK">Thaali Pakawnaar</option>
+								<option value="SUPER_USER">Super User</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="thaaliCategoryLabel">Thaali Category</label> <select
+								id="tCategory" class="form-control">
+								<option>Small</option>
+								<option>Medium</option>
+								<option>Large</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="tDeliveryLabel">Thaali Delivery Area/Region</label> <select
+								id="tDelivery" class="form-control">
+							</select>
+						</div>
+						<!-- radio -->
+						<div class="form-group col-md-6">
+							<div class="radio">
+								<label for="optionLabel1"> <input type="radio"
+									name="optionsRadios" id="radioNewFamily" value="option1"
+									checked /> Register User with a new family
+								</label>
+							</div>
+							<div class="radio">
+								<label for="optionLabel2"> <input type="radio"
+									name="optionsRadios" id="radioExistingFamily" value="option2" />
+									Register User with an existing family
+								</label>
+							</div>
+						</div>
+						<div class="form-group" style="display: none;" id="newFamily">
+							<input type="text" name="familyName" id="familyName"
+								class="form-control"
+								placeholder="Please enter a family name for the user" />
+						</div>
+						<!-- select -->
+						<div class="form-group" style="display: none;" id="existingFamily">							
+							 <select id="familyGroupId" name="familyGroupId" class="form-control">
+							   <option value=''>Please select a family for the user</option>
+							 </select>
+						</div>
+
+					</div>
+					<div class="box-footer clearfix">
+						<button type="submit" id="registerNewUserButton"
+							class="btn btn-primary pull-right">Register New User</button>
+					</div>
+				</form>		
+		</div>
+		<!-- /.box -->
+	     </div>
+	  </div>
+<!-- /.row (main row) -->
+<script type="text/javascript">
+onLoadRegisterNewUser();
+</script>
+

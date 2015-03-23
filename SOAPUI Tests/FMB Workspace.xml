@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-workspace name="FMB Workspace" soapui-version="4.6.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:project status="CLOSED" name="ThaaliDataService">C:/Users/hrangwala/fmb/SOAPUI Tests/ThaaliDataService-soapui-project.xml</con:project>
+  <con:project status="CLOSED" name="UserProfileDataService">C:/Users/hrangwala/fmb/SOAPUI Tests/UserProfileDataService-soapui-project.xml</con:project>
+  <con:project name="UserThaaliDataService">C:/Users/hrangwala/fmb/SOAPUI Tests/UserThaaliDataService-soapui-project.xml</con:project>
+</con:soapui-workspace>

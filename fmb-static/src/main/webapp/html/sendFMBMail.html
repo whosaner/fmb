@@ -1,0 +1,75 @@
+<div class="row">
+	<!-- quick email widget -->
+	<div class="col-md-12">
+		<div class="box box-info">
+			<div class="box-header">
+				<i class="fa fa-envelope"></i>
+				<h3 class="box-title"><span id="jamaatName"></span></h3>								
+			</div>
+			<div class="box-body">
+				<form role="form" action="#" method="post" id="emailForm">
+					<div class="callout callout-danger" id="emailErrorCallout"
+						style="display: none;">
+						<h4>An error has occurred!</h4>
+						<p>There is a problem with the system right now. Please try
+							again later, if the problem still persists, please contact the
+							system administrator.</p>
+					</div>
+					<div class="callout callout-info" id="emailSuccessCallout"
+						style="display: none;">
+						<h4>Success!</h4>
+						<p>Email has been sent successfully. Shukran!</p>
+					</div>
+					<div class="form-group">
+					    <label for="subjectLabel">Email Subject</label>
+						<input type="text" class="form-control" name="subject" id="subject" value=""/>
+					</div>
+					
+					
+					<!-- radio -->
+					<div class="form-group col-md-12">
+							<div class="radio">
+								<label for="optionLabel1"> <input type="radio"
+									name="optionsRadios" id="thaaliReminder" value="option1"
+									checked /> Thaali Update Reminder Message
+								</label>
+							</div>
+							<div class="radio">
+								<label for="optionLabel2"> <input type="radio"
+									name="optionsRadios" id="rotiReminder" value="option2" />
+									Mumenaat Roti Reminder Message
+								</label>
+							</div>
+							<div class="radio">
+								<label for="optionLabel3"> <input type="radio"
+									name="optionsRadios" id="general" value="option3" />
+									General Message.
+								</label>
+							</div>
+					</div>
+
+					<!-- We will include content below depending upon the radio button clicked above. -->
+					<div class="form-group" id="msgBodyDiv">					
+					</div>					
+					
+					<div class="form-group">
+						<label for="mailToTypeLabel">Email Recipients</label> <select
+							id="mailToType" name="mailToType" class="form-control">
+							<!-- option value="">Select email recipients</option -->
+							<option value="JAMAAT">Entire Jamaat</option>
+							<option value="ADMIN">Only Thaali Khidmatguzaar's</option>							
+							<option value="THAALI_PAKAWNAAR">Only Thaali Jaman Pakawnaar</option>
+							<!-- option value="ROTI_BANAWNAAR">Mumenaat making Roti's</option -->
+						</select>
+					</div>
+				</form>
+			</div>
+			<div class="box-footer clearfix">
+				<input type="button" class="pull-right btn btn-default" id="sendEmail" value="Send Email" />				
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	sendEmail('fmb');             
+</script>

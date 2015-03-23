@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project activeEnvironment="Default" name="UserThaaliDataService" resourceRoot="" soapui-version="4.6.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:RestService" wadlVersion="http://wadl.dev.java.net/2009/02" name="http://localhost:8080" type="rest" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache/><con:endpoints><con:endpoint>http://localhost:8080</con:endpoint></con:endpoints><con:resource name="GetThaaliData" path="/ajf/rest/userThaali/getThaaliData"><con:settings/><con:parameters><con:parameter><con:name>ejamaatId</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>password</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>fromDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>toDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter></con:parameters><con:method name="GetThaaliData" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/xml</con:mediaType><con:status>200</con:status><con:params/><con:element>response</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType>application/json</con:mediaType><con:status>200</con:status><con:params/><con:element xmlns:get="http://localhost/fmb/rest/userThaali/getThaaliData">get:Response</con:element></con:representation><con:representation type="FAULT"><con:mediaType>text/html;charset=utf-8</con:mediaType><con:status>404</con:status><con:params/><con:element>html</con:element></con:representation><con:request name="Request 1" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;entry key="Accept" value="application/json" xmlns="http://eviware.com/soapui/config"/></con:setting></con:settings><con:endpoint>http://localhost:8080</con:endpoint><con:request/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="fromDate" value="01/01/2014"/>
+  <con:entry key="ejamaatId" value="30308654"/>
+  <con:entry key="toDate" value="01/21/2014"/>
+  <con:entry key="password" value="test1234"/>
+</con:parameters></con:request></con:method></con:resource><con:resource name="UpdateThaaliData" path="/fmb/rest/userThaali/updateThaaliData"><con:settings/><con:parameters/><con:method name="updateThaaliData" method="POST"><con:settings/><con:parameters/><con:representation type="REQUEST"><con:mediaType>application/json</con:mediaType><con:params/></con:representation><con:representation type="FAULT"><con:mediaType>text/html;charset=utf-8</con:mediaType><con:status>500</con:status><con:params/><con:element>html</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType>application/xml</con:mediaType><con:status>200</con:status><con:params/><con:element>response</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:representation type="RESPONSE"><con:mediaType xsi:nil="true"/><con:status>0</con:status><con:params/><con:element>data</con:element></con:representation><con:request name="Request 1" mediaType="application/json" postQueryString="false"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://54.186.45.156</con:endpoint><con:request>{
+    "eJamaatId": "30308654",
+    "password": "test1234",
+    "dataList": [
+        {
+            "userThaaliDate": "01/04/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/15/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/17/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/18/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/19/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/20/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        },
+        {
+            "userThaaliDate": "03/21/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Nothing specific"
+        }
+        ,
+        {
+            "userThaaliDate": "03/22/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "CANCELLED_BY_USER",
+            "userInstructions": "Updating on 01/07/2014"
+        },
+        {
+            "userThaaliDate": "03/30/2014",            
+            "thaaliCategory": "SMALL",
+            "userThaaliStatus": "REQUESTED_BY_USER",
+            "userInstructions": "Updating on 01/07/2014"
+        }
+    ]
+}</con:request><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters/></con:request></con:method></con:resource><con:resource name="GetAllUserThaaliData" path="/fmb/rest/userThaali/getAllUserThaaliData"><con:settings/><con:parameters><con:parameter><con:name>ejamaatId</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>password</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>fromDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter><con:parameter><con:name>toDate</con:name><con:value/><con:style>QUERY</con:style><con:default/></con:parameter></con:parameters><con:method name="getAllUserThaaliData" method="GET"><con:settings/><con:parameters/><con:representation type="RESPONSE"><con:mediaType>application/xml</con:mediaType><con:status>200</con:status><con:params/><con:element>response</con:element></con:representation><con:request name="Request 1" mediaType="application/json"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:endpoint>http://54.186.45.156</con:endpoint><con:request/><con:credentials><con:authType>Global HTTP Settings</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:parameters>
+  <con:entry key="fromDate" value="12/01/2013"/>
+  <con:entry key="ejamaatId" value="30322554"/>
+  <con:entry key="toDate" value="01/11/2014"/>
+  <con:entry key="password" value="test123"/>
+</con:parameters></con:request></con:method></con:resource></con:interface><con:properties/><con:wssContainer/></con:soapui-project>
