@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.MailToType;
 
 @XmlRootElement(name="mail")
@@ -20,6 +21,8 @@ public class FmbMailMessage implements Serializable{
 	//TODO not too sure
 	private List<byte[]> mailAttachments;
 	private MailToType mailTo;
+	private EmailType emailType; //fmb, miqaat
+	
 	
 	
 	
@@ -53,4 +56,11 @@ public class FmbMailMessage implements Serializable{
 	public void setBodyContentType(String bodyContentType) {
 		this.bodyContentType = bodyContentType;
 	}
+	public EmailType getEmailType() {
+		return emailType;
+	}
+	public void setEmailType(EmailType emailType) {
+		this.emailType = emailType;
+	}
+	
 }

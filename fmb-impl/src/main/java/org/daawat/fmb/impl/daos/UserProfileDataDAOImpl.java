@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.daawat.fmb.api.db.UserProfileDataDAO;
 import org.daawat.fmb.api.enums.Category;
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.UserRole;
 import org.daawat.fmb.api.objects.UserCredentialData;
 import org.daawat.fmb.api.objects.UserProfileData;
@@ -100,7 +101,7 @@ public class UserProfileDataDAOImpl extends BaseJDBCDAO<UserProfileData> impleme
 			userProfileData.setFamilyGroupId(resultSet.getInt("FAMILY_GROUP_ID"));
 			userProfileData.setLocation(resultSet.getString("USER_LOCATION"));
 			userProfileData.setEmailAddresses(resultSet.getString("EMAIL_ADDRESSES"));
-			userProfileData.setSendEmail(resultSet.getBoolean("SEND_EMAIL"));
+			userProfileData.setEmailType(EmailType.getEnum(resultSet.getString("SEND_EMAIL")));
 			userProfileData.setUserCredentials(ucd);
 			userProfileDataList.add(userProfileData);
 		}

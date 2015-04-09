@@ -52,7 +52,7 @@ var thaaliStatusMap = [{displayName:"Yes", serverName:"REQUESTED_BY_USER", statu
                        {displayName:"No", serverName:"NOT_REQUESTED_BY_USER", status:"user_status"},
                        {displayName:"Yes (No Rice)", serverName:"REQUESTED_WITH_NO_RICE", status:"user_status"},
                        {displayName:"Yes", serverName:"THAALI_PRESENT", status:"thaali_status"},
-                       {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}]
+                       {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}];
 
 var user_thaali_category = ["Small","Medium","Large"];
 var num_of_days_to_Advance = 30; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
@@ -835,9 +835,27 @@ onLoadUserThaaliView = function(){
 		}
 		
 		columnArr = [
-		 { text: userThaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: cellWidth, cellsalign: 'center', editable: false, cellsformat: 'D'},            
-         { text: userThaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center',   width: cellWidth, editable: false },                    
-         { text: userThaaliTblHeaders.USER_THAALI_STATUS, datafield: 'userThaaliStatusUI', renderer: columnsrenderer, cellsalign: 'center',  width: cellWidth, columntype: 'dropdownlist',
+		 { text: userThaaliTblHeaders.THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, cellsalign: 'center', editable: false, cellsformat: 'D',
+			 width: (function(){
+                 if(isMobileView()){
+                         return '30%';
+                 }
+                 return cellWidth;
+         })()},         
+         { text: userThaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center', editable: false,
+        	 width: (function(){
+                 if(isMobileView()){
+                         return '35%';
+                 }
+                 return cellWidth;
+         })()},                    
+         { text: userThaaliTblHeaders.USER_THAALI_STATUS, datafield: 'userThaaliStatusUI', renderer: columnsrenderer, cellsalign: 'center', columntype: 'dropdownlist',
+        	 width: (function(){
+                 if(isMobileView()){
+                         return '35%';
+                 }
+                 return cellWidth;
+        	 })(),
          	cellsrenderer: function (row, columnfield, value, defaulthtml, columnproperties) {
          		// condition follows
          		var rowData  = $("#jqxUserThaaliDataGrid").jqxGrid('getrowdata', row);        
@@ -864,11 +882,12 @@ onLoadUserThaaliView = function(){
             		 }            		  
             	 }
                  
-                 editor.jqxDropDownList({theme:themeName,autoDropDownHeight: true, source: list,autoOpen:true,enableBrowserBoundsDetection:true });
-             },
+                 editor.jqxDropDownList({theme:themeName,autoDropDownHeight: true, source: list,autoOpen:true,enableBrowserBoundsDetection:true });				 
+			},
              // update the editor's value before saving it.
              cellvaluechanging: function (row, column, columntype, oldvalue, newvalue) {
                  // return the old value, if the new value is empty.
+            	 //$("#jqxUserThaaliDataGrid").jqxGrid('selectrow', row);
                  if (newvalue == "") return oldvalue;
              }
          },
@@ -886,9 +905,6 @@ onLoadUserThaaliView = function(){
         		if(isLocked == true || thaaliNotAvailable == true){            			
         			var id = "thaaliCategoryToolTip"+row;
            		    var cell = '<div id="'+id+'">'+defaulthtml+'</div>';
-           		    /*var element = $(cell);
-           		    element.css({ 'background-color': 'LightGray', 'width': '100%', 'height': '100%', 'margin': '0px' });
-                    return element[0].outerHTML;*/
            		    return cell;
         		}         		
          		return defaulthtml;                    
@@ -926,7 +942,7 @@ onLoadUserThaaliView = function(){
         height: '100%',
         pageable: true,
         rowsheight: 40,
-        columnsresize:true,
+        columnsresize:false,
         columnsheight: columnsHeight,
         editable: true,
         autorowheight:true,
@@ -934,20 +950,35 @@ onLoadUserThaaliView = function(){
         columns: getColumns()
     });
     
-    
-    
+    //TODO check if cellclick pevent precedes cellbeginedit event. also if bind event doesn't work try "bind"
+    $("#jqxUserThaaliDataGrid").on("cellclick", function (event) 
+	{
+	    var currentRow = event.args.rowindex;
+		var column = event.args.datafield;
+		//Check if the column being edited is the userThaaliStatusUI column and check if the row has been selected or not..
+		if(isMobileView() && column == "userThaaliStatusUI"){
+			var selectedRowIndex = $('#jqxUserThaaliDataGrid').jqxGrid('getselectedrowindex');
+			if(selectedRowIndex < 0 || currentRow != selectedRowIndex){
+				//Means row is not selected we need to select it for the first time.
+				//Remember this is done since there is an issue in iPhone 5,6, iPad etc where the user status dropdown was acting very strange. It would open and 
+				//close instantly and wouldn't let the user make any selection. The only fix for this was to select the row before clicking on the dropdownlist.
+				$("#jqxUserThaaliDataGrid").jqxGrid('selectrow', currentRow);				
+			}
+		}
+	});
+		
     
         
     //This method would make sure we dont let the user edit any fields if the Thaali Data is frozen for that day.
-    $("#jqxUserThaaliDataGrid").bind('cellbeginedit', function (event) {
+    $("#jqxUserThaaliDataGrid").bind('cellbeginedit', function (event) {		
     	var rowData =  $("#jqxUserThaaliDataGrid").jqxGrid('getrowdata', args.rowindex);
     	var isLocked = rowData.locked;
         var column = args.datafield;
         var row = args.rowindex;
         var value = args.value;
-        var msg = msg_on_thaali_frozen;
-        
+        var msg = msg_on_thaali_frozen;        
         var showMessage= false;
+		
         
         //Check if user had already signed up for the thaali or not, 
         //if the user has already signed up and isLocked is true then he/she should be given an option to modify or cancel.
@@ -2594,7 +2625,7 @@ validateEmailForm = function(){
 
 sendEmail = function(emailTemplateName) {
 	$('#jamaatName').html(jamaatName);
-	if(emailTemplateName == "fmb"){
+	if(emailTemplateName == "FMB"){
 		$('#subject').val("[Faiz-Al-Mawaid Al-Burhaniyah, "+jamaatName+ "]");		
 		//default this should be enabled.
 		$('#msgBodyDiv').html("");
@@ -2642,7 +2673,8 @@ sendEmail = function(emailTemplateName) {
 				body : message,
 				bodyContentType : $('#imgLoc').val(), //"text/html", 
 				subject : subject,
-				mailTo : mailToType
+				mailTo : mailToType,
+				emailType: emailTemplateName
 			};
 
 			// Creating an array of email, since the server accepts the data

@@ -22,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.daawat.fmb.api.db.UserProfileDataDAO;
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.MailToType;
 import org.daawat.fmb.api.objects.FmbMailMessage;
 import org.daawat.fmb.api.objects.Request;
@@ -83,19 +84,20 @@ public class MailService extends BaseService{
 		//We need to get email address of all jamaat members in order to send them email's.
 		for(int i=0;i<userProfiles.size();i++){
 			UserProfileData userProfile = userProfiles.get(i);
+			final EmailType emailType  = userProfile.getEmailType();
 			boolean append = false;
+			
 			if(MailToType.JAMAAT.equals(mailToType)){
 				append = true;
 			}
 			else if(mailToType.toString().equals(userProfile.getUserRole().toString())){
 				append = true;
 			}
-
-			if(append && userProfile.isSendEmail()){
+			
+			if(append && (EmailType.ALL.equals(emailType) || emailType.equals(msg.getEmailType()))){
 				emailAddresses = emailAddresses.length() > 0 && userProfile.getEmailAddresses().length()> 0 ? emailAddresses.append(","): emailAddresses.append("");
 				emailAddresses.append(userProfile.getEmailAddresses());
 			}
-
 		}
 		
 		

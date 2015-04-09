@@ -7,6 +7,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.daawat.fmb.api.enums.Category;
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.UserRole;
 
 @XmlRootElement(name="profile")
@@ -26,8 +27,12 @@ public class UserProfileData implements Serializable{
 	//This is needed to club a particular family member to a specific group.
 	private int familyGroupId;
 	private String emailAddresses = ""; //Comma separated list of email address.
-	private boolean sendEmail = true; //Flag which determines if we need to send email to the user/not. default should always be true.
+	private EmailType emailType; 
 
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	public UserProfileData() {
 		super();
@@ -138,13 +143,17 @@ public class UserProfileData implements Serializable{
 		this.emailAddresses = emailAddresses;
 	}
 	
-	public boolean isSendEmail() {
-		return sendEmail;
+
+	public EmailType getEmailType() {
+		return emailType;
 	}
 
-	public void setSendEmail(boolean sendEmail) {
-		this.sendEmail = sendEmail;
+	public void setEmailType(EmailType emailType) {
+		this.emailType = emailType;
 	}
+
+	
+	
 
 	public List<Object> toList_Insert(){
 		List<Object> objList = new ArrayList<Object>();
@@ -157,7 +166,7 @@ public class UserProfileData implements Serializable{
 		objList.add(familyGroupId);
 		objList.add(location);
 		objList.add(emailAddresses);
-		objList.add(sendEmail);
+		objList.add(emailType.getValue());
 		return objList;
 		
 	}
@@ -170,7 +179,7 @@ public class UserProfileData implements Serializable{
 		objList.add(thaaliCategory.getValue());
 		objList.add(location);
 		objList.add(emailAddresses);
-		objList.add(sendEmail);
+		objList.add(emailType.getValue());
 		objList.add(userCredentials.geteJamaatId());
 		objList.add(userCredentials.getPassword());
 		return objList;
