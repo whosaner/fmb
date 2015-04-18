@@ -11,7 +11,7 @@ public class Logger {
 	
 	public static void error(String className, String message, Throwable ex){
 		System.out.println(className+" : "+message+ " : "+ex.getMessage());
-		log.error(className+" : "+message, ex);
+		log.error(className+" : "+message +" "+ex.getMessage());
 	}
 	
 	public static void error(String className, String message){

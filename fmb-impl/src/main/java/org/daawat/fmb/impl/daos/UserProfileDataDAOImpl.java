@@ -56,6 +56,7 @@ public class UserProfileDataDAOImpl extends BaseJDBCDAO<UserProfileData> impleme
 		executeQueryAlt(sqlQuery);
 		while(resultSet.next()){
 			maxGroupId = resultSet.getInt("FAMILY_GROUP_ID");
+			System.out.println("Family Group Id - "+maxGroupId);
 		}
 		releaseConnection();
 		return maxGroupId;

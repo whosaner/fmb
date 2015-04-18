@@ -178,8 +178,7 @@ public class UserProfileData implements Serializable{
 		objList.add(firstName);
 		objList.add(thaaliCategory.getValue());
 		objList.add(location);
-		objList.add(emailAddresses);
-		objList.add(emailType.getValue());
+		objList.add(emailAddresses);		
 		objList.add(userCredentials.geteJamaatId());
 		objList.add(userCredentials.getPassword());
 		return objList;

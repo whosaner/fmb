@@ -1431,6 +1431,7 @@ onLoadViewThaaliAll = function(){
      });
    
    
+   
    $('#jqxAllUserThaaliDataGrid').on('bindingcomplete', function (event) {
 	      $("#jqxAllUserThaaliDataGrid").jqxGrid({ columns: createDynamicColumns() }); //need to update the  num of columns.
 	      //ALso we need to expand the group.
@@ -1470,7 +1471,10 @@ onLoadViewThaaliAll = function(){
    
   
   
-   
+  //Exporing the grid as excel for better viewing.
+   $("#excelExport").click(function () {
+       $("#jqxAllUserThaaliDataGrid").jqxGrid('exportdata', 'xls', 'thaaliSignup');
+    });
       
    //Defining the fromDate field
    $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
@@ -1600,7 +1604,6 @@ validateRegisterUserForm = function(){
 	            lettersonly:true
 	        },
 	        emailAdd: {
-	            required:true,
 	            multiemails:true
 	        },   	        
 	        familyName:{
@@ -1647,7 +1650,6 @@ validateRegisterUserForm = function(){
 	        	required:"Please select a family for the user."
 	        },
 	    	emailAdd:{
-	    		required:"Email Address is required.",
 	    		multiemails:"Please enter a valid email address. Multiple email address can be separated by a comma."
 	    	}
 		}
@@ -1724,6 +1726,7 @@ onLoadRegisterNewUser = function(){
 				var tDelivery = $('#tDelivery').val();
 				var userRole = $('#userRole').val();
 				var emailAddress = $('#emailAdd').val();
+				var emailDelivery = $('#tEmailType').val();
 				var familyGroupId = 0;
 				
 				if($('#radioNewFamily').is(':checked')){
@@ -1746,7 +1749,8 @@ onLoadRegisterNewUser = function(){
 				   "thaaliCategory":tCategory,
 				   "userRole":userRole,
 				   "familyGroupId":familyGroupId,
-				   "emailAddresses":emailAddress
+				   "emailAddresses":emailAddress,
+				   "emailType":emailDelivery
 			    };
 			   
 			   var userProfileArr = new Array();
@@ -1781,7 +1785,6 @@ validateUserProfileForm = function(){
 	$('#userProfileForm').validate({
 	    rules: {
 	    	emailIp: {
-                required: true,
                 multiemails: true
             }         
 	    },
@@ -1792,7 +1795,6 @@ validateUserProfileForm = function(){
 	    
 	    messages: {
 	    	emailIp: {
-	    		required: "Please enter a valid email address",
 	    		multiemails: "Please enter a valid email address"
 	    	}	    	
 		}

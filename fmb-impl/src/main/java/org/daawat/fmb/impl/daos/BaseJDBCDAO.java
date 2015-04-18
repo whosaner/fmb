@@ -34,20 +34,30 @@ public  abstract class BaseJDBCDAO<T>{
 	protected ResultSet resultSet = null;
 	private static DataSource datasource = null;
 	
-	public BaseJDBCDAO(){
-		//We need to do some initializations
-		if(datasource == null){
+	/**
+	 * Below block will make sure we do the initializations only once.
+	 */
+	static {
+		// We need to do some initializations
+		if (datasource == null) {
 			Context initContext = null;
 			String dsJndiName = null;
 			try {
-				dsJndiName  = PropertyFileManager.getProperty( "datasourceJndi");
+				dsJndiName = PropertyFileManager.getProperty("datasourceJndi");
 				initContext = new InitialContext();
-				Context envContext  = (Context)initContext.lookup("java:/comp/env");
-				datasource = (DataSource)envContext.lookup(dsJndiName);
+				Context envContext = (Context) initContext
+						.lookup("java:/comp/env");
+				datasource = (DataSource) envContext.lookup(dsJndiName);
 			} catch (Exception e) {
-				Logger.error(COMP_NAME, "An exception has occurred in the static block - jndi name -"+dsJndiName, e);
+				Logger.error(COMP_NAME,
+						"An exception has occurred in the static block - jndi name -"
+								+ dsJndiName, e);
 			}
 		}
+	}
+	
+	public BaseJDBCDAO(){
+		
 	}
 	
 	
@@ -72,7 +82,7 @@ public  abstract class BaseJDBCDAO<T>{
 				updateCount = prepareStatement.getUpdateCount();
 				Logger.info(COMP_NAME, "No of rows affected by the sqlQuery is - "+updateCount);
 			}			
-		} catch (Exception e) {
+		}  catch (Exception e) {
 			// Log Message
 			Logger.error(COMP_NAME, "An exception has occurred inside the executeQuery method for sqlQuery -"+sqlQuery, e);
 			throw e;
@@ -95,13 +105,11 @@ public  abstract class BaseJDBCDAO<T>{
 				updateCount = prepareStatement.getUpdateCount();
 				Logger.info(COMP_NAME, "No of rows affected by the sqlQuery is - "+updateCount);
 			}			
-		} catch (Exception e) {
+		}  catch (Exception e) {
 			// Log Message
 			Logger.error(COMP_NAME, "An exception has occurred inside the executeQuery method for sqlQuery -"+sqlQuery, e);
 			throw e;
-		}finally{
-			releaseConnection(); //releasing the connection and the prepare statement
-		}		
+		}	
 	}
 	
 	/**
@@ -137,12 +145,14 @@ public  abstract class BaseJDBCDAO<T>{
 	}
 
 	private void getPrepareStatement(String sqlQuery) throws Exception {
-		this.connection = datasource.getConnection();
+		this.connection = datasource.getConnection();		
 		this.connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
 		this.connection.setAutoCommit(true);
 		this.prepareStatement = connection.prepareStatement(sqlQuery);		
 		Logger.info(COMP_NAME, "Getting the prepared statement for the sql query --"+sqlQuery);
 	}
+	
+	
 	
 	/*private void getPrepareStatement(String sqlQuery) throws Exception {
 		String driverClass = PropertyFileManager.getProperty( "db.driverClassName");
