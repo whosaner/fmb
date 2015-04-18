@@ -55,7 +55,7 @@ var thaaliStatusMap = [{displayName:"Yes", serverName:"REQUESTED_BY_USER", statu
                        {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}];
 
 var user_thaali_category = ["Small","Medium","Large"];
-var num_of_days_to_Advance = 30; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
+var num_of_days_to_Advance = 60; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
 
 var thaaliTblHeaders = {THAALI_MADE_BY:"Thaali <br/> Pakawnaar",MENU:"Menu", INSTRUCTIONS: "Instructions <br/> (If any)", THAALI_STATUS: "Status", THAALI_DATE: "Date", VISIBLE: "Visible <br/> to <br/> Jamaat"};
 var userThaaliTblHeaders = {MENU:"Menu", THAALI_STATUS: "Thaali Available for the day", THAALI_DATE: "Thaali <br/> Date", THAALI_CATEGORY: "Category", USER_THAALI_STATUS: "Thaali <br/> Requested"};
@@ -1473,7 +1473,7 @@ onLoadViewThaaliAll = function(){
   
   //Exporing the grid as excel for better viewing.
    $("#excelExport").click(function () {
-       $("#jqxAllUserThaaliDataGrid").jqxGrid('exportdata', 'xls', 'thaaliSignup');
+       $("#jqxAllUserThaaliDataGrid").jqxGrid('exportdata', 'html', 'thaaliSignup');
     });
       
    //Defining the fromDate field
