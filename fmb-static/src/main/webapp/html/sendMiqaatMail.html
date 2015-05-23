@@ -25,7 +25,8 @@
 						<input type="text" class="form-control" name="subject" id="subject" value=""/>
 					</div>
 					<div class="form-group">
-						<textarea class="textarea" placeholder="Message" id="messageBody" name="messageBody"
+					   <div>
+					     <textarea class="textarea" placeholder="Message" id="messageBody" name="messageBody"
 							style="width: 100%; height: 125px; font-size: 14px; line-height: 18px; border: 1px solid #dddddd; padding: 10px;">
 						   <p>Baad Salaamil Jameel <br>
 						   <b>Function</b>: Urus :&nbsp;<br>
@@ -35,6 +36,7 @@
 						   <b>Venue</b>: Markaz <br>
 						   </p>
 					   </textarea>
+					   </div>						
 					</div>
 					<div class="form-group">
 					    <input type="hidden" class="form-control" name="mailToType" id="mailToType"
@@ -48,6 +50,7 @@
 		</div>
 	</div>
 </div>
-<script type="text/javascript">
+<script type="text/javascript">   
+   $(".textarea").wysihtml5({"color": true});
 	sendEmail('MIQAAT');
 </script>

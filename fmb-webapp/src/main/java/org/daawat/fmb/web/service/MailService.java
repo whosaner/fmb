@@ -153,7 +153,7 @@ public class MailService extends BaseService{
 			//send the message			
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(PropertyFileManager.getProperty("mail.email.from")));
-			message.setRecipients(Message.RecipientType.TO,
+			message.setRecipients(Message.RecipientType.BCC,
 				InternetAddress.parse(emailAddresses.toString(), false));
 			message.setSubject(subject);			
 			message.setContent(content);			
