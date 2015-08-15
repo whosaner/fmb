@@ -13,12 +13,21 @@
             </div>
 			<!-- THE CALENDAR -->
 			<div id="thaaliCalendarDisplay"></div>
+			<div id="thaaliViewMsgPopup" style="display: none;">
+				<div>Message</div>
+				<div id="thaaliViewMsgContent"></div>
+			</div>
+			<div class="box-footer clearfix" style="display: block;">
+				<button class="pull-right btn btn-primary" id="submitUserThaaliDataButton">Update Thaali Data</button>
+			</div>
 		</div>
 		<!-- /.box -->
 	</section>
 </div>
 <!-- /.row (main row) -->
 <script type="text/javascript">
-	onLoadThaaliCalendar();
+$(document).ready(function () {
+	 onLoadThaaliCalendar();
+});
 </script>
 

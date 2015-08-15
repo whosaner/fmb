@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.daawat.fmb.api.db.ThaaliCookDAO;
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.objects.ThaaliCook;
 import org.daawat.fmb.utils.PropertyFileManager;
 
@@ -33,7 +34,9 @@ public class ThaaliCookDAOImpl extends BaseJDBCDAO<ThaaliCook> implements Thaali
 		List<ThaaliCook> cookList = new ArrayList<ThaaliCook>();
 		while(resultSet.next()){
 			ThaaliCook cook = new ThaaliCook();
-			cook.setCookName(resultSet.getString("COOK"));			
+			cook.setCookName(resultSet.getString("COOK"));
+			cook.setEmailAddress(resultSet.getString("EMAIL_ADDRESSES"));
+			cook.setEmailType(EmailType.getEnum(resultSet.getString("SEND_EMAIL")));
 			cookList.add(cook);
 		}
 		return cookList;

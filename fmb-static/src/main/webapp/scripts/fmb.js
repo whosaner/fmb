@@ -117,6 +117,14 @@ var columnsHeight= 60;
 
 var mobile_view_screen_size = 992;
 
+var thaaliRequested = "Yes";
+var thaaliNotReq = "No";
+var requestedButtonTemplate = "success";
+var notRequestedButtonTemplate = "warning";
+//An array that will hold the date when the user has opted for thaali.
+var userThaaliSignupArr = new Array();
+
+
 /**
  * A generic method which will do a ajax call depending upon the input params.
  * @param methodType
@@ -250,6 +258,8 @@ logout = function(){
  *  
  **/
 onLoadThaaliSchedule = function () {
+	        var updatedRecords = {}; //Array that would hold the rowIndex of the records that needs to be sent to the server.
+	        
 			var offset = $("#jqxAdminThaaliDataGrid").offset();
 		    //Initializing a popup window, we would need this to display any success/error messages.
     		$("#thaaliScheduleMsgPopup").jqxWindow({ width: 500, height: 100 ,  autoOpen:false, theme:themeName});
@@ -266,9 +276,30 @@ onLoadThaaliSchedule = function () {
 
             
             
-           //source for getting the cook name
-            var cooknameUrl = get_cookname_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword();
-            var cooknameSource = {
+            //source for getting the cook name
+            var cooknameUrl = get_cookname_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword();            
+        	var dataObj = handleAjax("GET",cooknameUrl,""); //since its a get we dont need to pass any data to the ajax call.        	
+        	var cookNameArr =  dataObj.jsonData.dataList; //get the list of cooks.
+        	var cooks = new Array();
+        	
+    		for(var i=0;i<cookNameArr.length;i++){
+    			var cookObj = cookNameArr[i];
+    			cooks.push(cookObj.cookName);
+    		}
+    		
+    		
+    		//source for getting the menu name
+            var menuUrl = get_menu_service_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword();            
+        	var dataObj = handleAjax("GET",menuUrl,""); //since its a get we dont need to pass any data to the ajax call.        	
+        	var menuArr =  dataObj.jsonData.dataList; //get the list of cooks.
+        	var menus = new Array();
+        	
+    		for(var i=0;i<menuArr.length;i++){
+    			var menuObj = menuArr[i];
+    			menus.push(menuObj.menu);
+    		}
+        	
+            /*var cooknameSource = {
                     datatype: "json",
                     datafields: [
                         { name: 'cookName', type: 'string' },
@@ -276,6 +307,18 @@ onLoadThaaliSchedule = function () {
                     url: cooknameUrl
             };
             var cookAdapter = new $.jqx.dataAdapter(cooknameSource);
+            
+            //source for getting the menu
+            var menuUrl = get_menu_service_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword();
+            var menuSource = {
+                    datatype: "json",
+                    datafields: [
+                        { name: 'menu', type: 'string' },
+                    ],
+                    url: menuUrl
+            };
+            var menuAdapter = new $.jqx.dataAdapter(menuSource);
+            */
             
             // prepare the data
             var source =
@@ -297,16 +340,7 @@ onLoadThaaliSchedule = function () {
                 sortdirection: 'asc'
             };
             
-            //source for getting the menu
-            var menuUrl = get_menu_service_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword();
-            var menuSource = {
-                    datatype: "json",
-                    datafields: [
-                        { name: 'menu', type: 'string' },
-                    ],
-                    url: menuUrl
-            };
-            var menuAdapter = new $.jqx.dataAdapter(menuSource);
+            
             
             var dataAdapter = new $.jqx.dataAdapter(source,{
             	loadError: function(jqXHR, status, error){
@@ -336,7 +370,7 @@ onLoadThaaliSchedule = function () {
                     			}else{
                     				record.visible = "No";
                     			}
-                    			
+                    			                    			
                     			data.push(record);
                 			}
                 		}
@@ -358,7 +392,7 @@ onLoadThaaliSchedule = function () {
             	autorowheight:true,
             	altrows: true,
             	width: '100%',
-                height: '100%',
+                height: getHeight(),
                 source: dataAdapter,
                 pageable: true,
                 rowsheight: 40,
@@ -378,7 +412,8 @@ onLoadThaaliSchedule = function () {
                     { text: thaaliTblHeaders.MENU, datafield: 'menu', renderer: columnsrenderer, cellsalign: 'center', columntype: 'combobox',
                         createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
                             // assign a new data source to the combobox.
-                            editor.jqxComboBox({theme:themeName, source:menuAdapter,displayMember: "menu", valueMember: "menu", autoDropDownHeight: true, promptText: "Please Choose a Menu or Enter one:", enableBrowserBoundsDetection:true });
+                            editor.jqxComboBox({theme:themeName, source:menus,displayMember: "menu", valueMember: "menu", autoDropDownHeight: true, promptText: "Please Choose a Menu or Enter one:", enableBrowserBoundsDetection:true });
+                            editor.jqxComboBox('selectItem',cellvalue);
                         },
                         // update the editor's value before saving it.
                         cellvaluechanging: function (row, column, columntype, oldvalue, newvalue) {
@@ -393,10 +428,11 @@ onLoadThaaliSchedule = function () {
                         })()
                         
                     },
-                    { text: thaaliTblHeaders.THAALI_MADE_BY, datafield: 'cookName', renderer: columnsrenderer,  cellsalign: 'center', width: '15%', columntype: 'combobox',
+                    { text: thaaliTblHeaders.THAALI_MADE_BY, datafield: 'cookName', renderer: columnsrenderer,  cellsalign: 'center', width: '15%', columntype: 'combobox', 
                         createeditor: function (row, cellvalue, editor, celltext, cellwidth, cellheight) {
                             // assign a new data source to the combobox.
-                            editor.jqxComboBox({theme:themeName, source:cookAdapter,displayMember: "cookName", valueMember: "cookName", autoDropDownHeight: true, promptText: "Please Choose a Thaali Pakawanaar or Enter one:", enableBrowserBoundsDetection:true});
+                            editor.jqxComboBox({theme:themeName, source:cooks,displayMember: "cookName", valueMember: "cookName", autoDropDownHeight: true, promptText: "Please Choose a Thaali Pakawanaar or Enter one:", enableBrowserBoundsDetection:true});
+                            editor.jqxComboBox('selectItem',cellvalue);
                         },
                         // update the editor's value before saving it.
                         cellvaluechanging: function (row, column, columntype, oldvalue, newvalue) {
@@ -518,6 +554,8 @@ onLoadThaaliSchedule = function () {
             	row["visible"] = "No";
             	//For new rows adding the user name
             	row["adminName"] = getFirstName();
+            	row["type"] = "new"; //identifier to denote that this is a new row added.
+            	
             	
             	return row;
             	
@@ -655,6 +693,22 @@ onLoadThaaliSchedule = function () {
             
             /**************** Delete row functionality ends **************************************************/
             
+            //This method is invoked whenever the admin tries to modify a particular row. 
+            $("#jqxAdminThaaliDataGrid").bind('cellendedit', function (event) {		
+            	var args = event.args;
+                var columnDataField = args.datafield;
+                var rowIndex = args.rowindex;
+                var cellValue = args.value;
+                var oldValue = args.oldvalue;
+                
+                if(oldValue != cellValue){
+                	//Means the cell has been updated with new data..
+                	updatedRecords[rowIndex] = true;
+                }
+               
+
+             });
+            
             /************ Insert in DB *******************************************/
             
             
@@ -673,20 +727,24 @@ onLoadThaaliSchedule = function () {
             		
             		for(var i=0;i<rows.length;i++){
             			var mRow = new Object();
-            			mRow.cookName = rows[i].cookName;
-            			mRow.menu = rows[i].menu;
-            			mRow.instructions = rows[i].instructions;
-            			mRow.status = rows[i].status;
-            			if(rows[i].visible == "Yes"){
-            				mRow.visible = true;
-            			}else{
-            				mRow.visible = false;
-            			}
+            			if(updatedRecords[i] == true || rows[i]["type"] == "new"){
+            				//This means that either the contents of the row has been updated by the admin or its a new row and only then we need to save this in the db...
+            				mRow.cookName = rows[i].cookName;
+                			mRow.menu = rows[i].menu;
+                			mRow.instructions = rows[i].instructions;
+                			mRow.status = rows[i].status;
+                			if(rows[i].visible == "Yes"){
+                				mRow.visible = true;
+                			}else{
+                				mRow.visible = false;
+                			}
 
-            			mRow.adminName = rows[i].adminName;
-            			var dateObj = rows[i].thaaliDateEntered;
-            			mRow.thaaliDateEntered = getFormattedDate(dateObj); //we need to convert the format of date to a suitable format understood by the server.
-            			mRowArr.push(mRow);
+                			mRow.adminName = rows[i].adminName;
+                			var dateObj = rows[i].thaaliDateEntered;
+                			mRow.thaaliDateEntered = getFormattedDate(dateObj); //we need to convert the format of date to a suitable format understood by the server.
+                			mRowArr.push(mRow);
+            			}
+            			
             		}
             		jsonData.dataList = mRowArr;
             		jsonData = JSON.stringify(jsonData);//we"ll have to stringify the object before sending it over the wire.
@@ -700,6 +758,7 @@ onLoadThaaliSchedule = function () {
             				
             				$("#thaaliScheduleMsgContent").html(successMsg);
                         	$("#thaaliScheduleMsgPopup").jqxWindow('open');
+                        	updatedRecords = {}; //Lets reset the state of the updated records.
             			},
             			error: function(){
             				$("#thaaliScheduleMsgContent").html(errorMsg);
@@ -939,7 +998,7 @@ onLoadUserThaaliView = function(){
     	theme: themeName,
     	altrows: true,
     	width: '100%',
-        height: '100%',
+        height: getHeight(),
         pageable: true,
         rowsheight: 40,
         columnsresize:false,
@@ -1238,7 +1297,7 @@ onLoadThaaliCount = function(){
    	   altrows: true,
    	   width: '100%',
    	   autorowheight:true,
-       height: '100%',
+       height: getHeight(),
        pageable: true,
        rowsheight: 40,
        columnsresize:true, 
@@ -1457,7 +1516,7 @@ onLoadViewThaaliAll = function(){
    	altrows: true,
    	width: '100%',
    	autorowheight:true,
-    height: '100%',
+    height: getHeight(),
     pageable: true,
     rowsheight: 40,
     columnsresize:true,
@@ -1978,7 +2037,7 @@ onLoadUserFeedback = function(){
     	autorowheight:true,
     	width: '100%',
         columnsresize:true,
-        height: '100%',
+        height: getHeight(),
         pageable: true,
         rowsheight: 40,
         columnsresize:true,
@@ -2242,12 +2301,25 @@ function isMobileView(){
 }
 
 /**
+ * Utility method that returns the height of the table.
+ * 
+ * @returns {String}
+ */
+function getHeight(){
+	//TODO depending upon the device and the screen size the height should change.
+	/*Also this value was earlier set to '100%' but there was an issue in Chrome/IE/FIrefox only on WIndows 8 where the height of the table was getting set to 0px. 
+	It seemed as a bug in jqxWIdgets framework code and hence i thought of hardcoding the pixel size to fix that.
+	The code that calculates the height based on the percentage was not behaving the way it shud have (thats a guess)*/
+	return '400px';
+}
+
+/**
  * Method which would be invoked on load of dashboard page.
  */
 init = function(){
 	//Be default always the user thaali view should be in view.
 	if(getCookie() != null){
-		toggle('thaaliSignup');
+		toggle('thaaliCalendar');
 		var userName = welcomeMessage+getUserName();
 		//setting the user name on the screen.
 		$('#userName').html(userName);
@@ -2488,19 +2560,41 @@ onLoadMiscellaneous = function(){
 }
 
 
+
 //Functionality to display the thaali calendar.
 onLoadThaaliCalendar = function(){
 	//full calendar functionality
 	//step 1 : get thaali data from (by default will return data for 30 days from current date.)
 	//step 2 : if the data returned from above is not null and not empty, create events for each row of thaali data.
 	//step 3 : enable users to navigate only till the month for which thaali data is available. i.e disable user from navigating too far.
+
+
+        /*
+ 	*  Display the signup button only if thaali is present and if modifications are allowed.
+ 	*  In case of mobile view, dont display the message that the thaali cannot be selected. 
+ 	*  save the id of the button, the current state and the next state for each button.
+ 	*  if possible - thaalis not requested should be orange and once requested should change to green.
+        */
+	//this will hold the state of the user's thaali request. this is needed since on window resize the state of the thaali request is lost.
+	var thaaliRequestStateArr = new Array();
+	//get the service url
+    var currentDate = new Date();
+    currentDate.setDate(1); //always starting from 1st day of the month...
+    var toDate =  new Date();
+    toDate.setDate(toDate.getDate() + num_of_days_to_Advance);
+    
 	
-	var url = admin_thaali_get_service_url+"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&isVisible=true";
+	var url = createUserThaaliDataGetUrl(currentDate, toDate);
 	var dataObj = handleAjax("GET",url,""); //getting the thaali data. 
 	var background = "#d9edf7"; //#00a65a - green //#d9edf7 - blue //#ffffff
 	var redBg = "#f56954";
 	var yellowBg = "#f39c12";
+
+	//Initializing a popup window, we would need this to display any success/error messages.
+	$("#thaaliViewMsgPopup").jqxWindow({ width: '20%', height: '10%' , autoOpen:false, theme:themeName});
 	
+	/* We would need a way to create toggle buttons each button would be for a pacrticular day. Also, the below array will hold an array of objects.*/
+	var jqxButtonArr =  new Array();
 	if(!dataObj.error){
 		$('#thaaliCalendarErrorCallout').hide();
 		//We need to initialize the calendar and populate the events array.
@@ -2511,52 +2605,128 @@ onLoadThaaliCalendar = function(){
 		var eventsArr =  new Array();
 		var cssClass = "eventClass";
 		
-		for(var i=0;i<thaaliList.length;i++){
+       
+		
+		for (var i = 0; i < thaaliList.length; i++) {
 			var thaaliData = thaaliList[i];
+			var isLocked = thaaliData.locked;
 			var bg = background;
 			var title = "";
 			//check for first record.
-			if(i == 0){
+			if (i == 0) {
 				startDate = thaaliData.thaaliDate;
 			}
-			
+
+			/* object that will hold the event details that correspond to the full calendar.*/
 			var event = {};
 			
 			var eventDate = getUTCDate(thaaliData.thaaliDate);
-			event.start  = eventDate;
-			
-			if(thaaliData.instructions == null || thaaliData.instructions.trim().length == 0){
-				thaaliData.instructions == "";
+			/*Every event will have a date*/
+			event.start = eventDate;
+
+			/* This will determine if the admin has stored any instructions for the particular thaali day.*/
+			if (thaaliData.thaaliInstructions == null || thaaliData.thaaliInstructions.trim().length == 0) {
+				thaaliData.thaaliInstructions == "";
 			}
-			
-			if(thaaliData.status == allowed_thaali_status[1]){
-				//means thaali is not present on this day.we need to change the title.				
-				title = "<i>No Thaali <br/><small>" + thaaliData.instructions+"</small></i>";
-				bg = redBg;				
-			}else{
-				if(thaaliData.instructions.toLowerCase().indexOf("open") >= 0 ){
+
+			if (thaaliData.thaaliStatus == allowed_thaali_status[1]) {
+				//means thaali is not present on this day.we need to change the title and display instructions if any.
+				title = "<center><b><i><h4>No Thaali <br/><small>" + thaaliData.thaaliInstructions + "</small></h4></i></b></center>";
+				bg = redBg;
+			} else {
+				//Means thaali is present for this day..
+				/* Object that would hold the details about the jqx toggle button that we need to create only when thaali is present*/
+				var jqxButtonObj = {};
+				//For each jqxButton we would need to store the following information.
+				var userStatus = "";
+				var buttonTemplate = "";
+				var displayMsg = "";
+				var buttonId = "jqxButton"+i;
+				var disabled = false;
+				var thaaliDate = eventDate;
+				
+				var content = "";
+				if (thaaliData.thaaliInstructions.toLowerCase().indexOf("open") >= 0) {
 					//no thaali pakawnaar for this day, we need to highlight it..
-					title = "<i>"+thaaliData.menu +"<br/><i>Thaali Pakawanaar Needed.</i>";
-					bg = yellowBg;					
-				}else{
-					title ="<i>"+thaaliData.menu +"<br/><small>"+ thaaliData.instructions +"</small></i>";
-					bg = background;
+					content = "<small> Thaali Pakawanaar Needed </small>";
+					bg = yellowBg;
+				} else {
+					content = "<small>" + thaaliData.thaaliInstructions + "</small>";
+					//bg = background;
+					bg = "#f9f9f9"; //grey background
 				}
+				/* We know for sure that Thaali is present for this day, but we need to determine is the user allowed to make any modifications*/
+				
+				//Check if user had already signed up for the thaali or not,
+				//if the user has already signed up and isLocked is true then he/she should be given an option to modify or cancel.
+				//If not signed up earlier show message and no modifications should be allowed...			
+				
+				if (thaaliData.userThaaliStatus == "NOT_REQUESTED_BY_USER") {
+				 //User is allowed to select thaali...
+				  userStatus = thaaliNotReq;
+				  buttonTemplate = notRequestedButtonTemplate;
+				}else{
+				  userStatus = thaaliRequested;
+				  buttonTemplate = requestedButtonTemplate;
+				}
+				
+				
+				if (isLocked == true) {
+					if (thaaliData.userThaaliStatus == "NOT_REQUESTED_BY_USER") {
+						//Means the thaali date has been frozen...no more modifications allowed at this time.
+						disabled = true;
+						displayMsg = msg_on_thaali_frozen
+					} else {
+						//What if the date has been passed, this means user cannot update the record anymore.
+						// make sure the thaali date is a future date and not a past date.
+						var today = new Date();
+						//reset todays date
+						today.setHours(0);
+						today.setMinutes(0);
+						today.setSeconds(0);
+						today.setMilliseconds(0);
+
+						if (thaaliData.thaaliDate < today) {
+							displayMsg = "Thaali Date has already been passed. No more changes are allowed.";
+							disabled = true;
+						}
+					}
+				}
+
+				var buttonHtml = "<div id=\""+buttonId+"toolTip\"><input type=\"button\" class=\"thaaliSignupToggleButton\" value=\"" + userStatus + "\" id=\"" + buttonId + "\" isDisabled = "+disabled+" message=\""+displayMsg+"\" thaaliDate=\""+thaaliDate+"\" category=\""+thaaliData.userThaaliCategory+"\"/></div>";
+				if (isMobileView()) {
+					title = "<center><b><i>" + thaaliData.menu + "<br/><br/>" + buttonHtml + "<br/>" + content + "</i></b></center>";
+				} else {
+					title = "<center><b><i><h4>" + thaaliData.menu  + "<br/><br/>" + buttonHtml  + "<br/>" + content + "</h4></i></b></center>";
+				}
+				//pushing the jqxButtonObj to the buttton array which would be used later..
+
+				jqxButtonObj.userStatus = userStatus;
+				jqxButtonObj.buttonTemplate = buttonTemplate;
+				jqxButtonObj.displayMsg = displayMsg;
+				jqxButtonObj.buttonId = buttonId;
+				jqxButtonObj.disabled = disabled;
+				
+				jqxButtonArr.push(jqxButtonObj);
+				
 			}
 			event.title = title;
 			event.backgroundColor = bg;
 			event.borderColor = bg;
-			event.className= cssClass;
-			event.textColor='#606060'; //dark grey color.
-			
+			event.className = cssClass;
+			event.textColor = '#606060'; //dark grey color.
+
+			//var hijriCalendar = $.calendars.instance("islamic");
+
 			//check if it is last record.
-			if(i+1 == thaaliList.length){
+			if (i + 1 == thaaliList.length) {
 				//means last record..we need the end date.
 				endDate = event.start;
 			}
-			
+			event.buttonObj = jqxButtonObj;
 			eventsArr.push(event); //pushing the event.
 		}
+		
 		
 		
         $('#thaaliCalendarDisplay').fullCalendar({
@@ -2577,16 +2747,184 @@ onLoadThaaliCalendar = function(){
             events: eventsArr,
             editable: false,
             droppable: false,
-            eventRender: function(event, element) {                                          
-            	element.find('span.fc-event-title').html(element.find('span.fc-event-title').text());					  
+            eventRender: function(event, element) {             	
+            	 element.find('span.fc-event-title').html(element.find('span.fc-event-title').text());
             },
+            
+            /* This method gets triggered after all events have rendered completely .
+            eventAfterAllRender: function(view){
+            	if ($(window).width() <= 768){
+            		//Means mobile view...we need to reduce the text size within the button.
+            		$(".thaaliSignupToggleButton").css({"font-size": "30%"});
+            		
+            	} 
+            },*/
+            
+            /* This method gets invoked after the eventRender function above. */
+            eventAfterRender: function( event, element, view ) { 
+              var jqxButtonObj  = event.buttonObj;
+              var buttonId = "#"+jqxButtonObj.buttonId;
+              var width = '85%';
+              if ($(window).width() <= 768){
+          		//Means mobile view...we need to reduce the width of the button.
+            	  width = '70%';          		
+          	  }
+      		  $(buttonId).jqxToggleButton({ width: width, height: '50%', toggled: true, disabled: jqxButtonObj.disabled, roundedCorners: 'all', template: jqxButtonObj.buttonTemplate});
+      		  //We need to save the state of the user thaali request.. this is needed because on window resize, fullCalendar does not save the dom that we modifief on button click.
+      		  var btnValue = thaaliRequestStateArr[buttonId];
+			
+      		  if(btnValue != null && btnValue.trim().length > 0){      			
+      			if(btnValue === thaaliNotReq){
+    				$(buttonId)[0].value = thaaliNotReq;
+    				$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});    				
+    			}else{
+    				$(buttonId)[0].value = thaaliRequested;	
+    				$(buttonId).jqxToggleButton({template:requestedButtonTemplate});
+    			}
+      		  }
+      		  
+      		  var isDisabled = $(buttonId).attr('isDisabled');
+      		  if(isDisabled === "true"){
+      			//Depending upon the screen size we also need to display the message why it is disabled..
+      			var msg = $(buttonId).attr('message');
+      			var toolTipId = buttonId+"toolTip";
+      			$(toolTipId).jqxTooltip({
+      				position : 'top',
+      				content : msg,
+      				theme : themeName
+      			});
+      		  }
+      		  
+      		  /* Method that will be called when the user clicks on the thaali signup button*/
+      		  $(buttonId).bind('click', function () {        		
+        		var isDisabled = $(this).attr('isDisabled');   		        		
+        		if(isDisabled === "false"){
+        			var thaaliDataObj = {};
+        			var thaaliDate =  $(this).attr('thaaliDate');
+        			
+        			var btnValue =  $(buttonId)[0].value;
+        			//we need to toggle the button values..
+        			if(btnValue === thaaliNotReq){
+        				$(buttonId)[0].value = thaaliRequested; //user friendly message
+        				$(buttonId).jqxToggleButton({template:requestedButtonTemplate}); //apply a suitable template based on the user request
+        				thaaliDataObj.userThaaliStatus = "REQUESTED_BY_USER"; //save the status to be upated server side.
+        				thaaliRequestStateArr[buttonId] = thaaliRequested; //save the thaali state for later use.
+        			}else{
+        				$(buttonId)[0].value = thaaliNotReq;	
+        				$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});
+        				thaaliDataObj.userThaaliStatus = "NOT_REQUESTED_BY_USER";
+        				thaaliRequestStateArr[buttonId] = thaaliNotReq;
+        			}
+        			thaaliDataObj.thaaliDate = new Date(thaaliDate);
+        			thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
+        			thaaliDataObj.thaaliCategory = $(this).attr('category');
+        			//Updating the array of thaali data objects.
+        			userThaaliSignupArr.push(thaaliDataObj);
+        		}else{
+        			//Depending upon the screen size we also need to display the message why it is disabled..
+        			var msg = $(this).attr('message');
+        			var toolTipId = buttonId+"toolTip";
+        			$(toolTipId).jqxTooltip({
+        				position : 'top',
+        				content : msg,
+        				theme : themeName
+        			});
+        		}
+        	    });
+            }
+           
         });
+        
+        
+        
+       /* $(".thaaliSignupToggleButton").bind('click', function () {
+    		var buttonId = "#" + $(this).attr('id');
+    		var isDisabled = $(this).attr('isDisabled');
+    		
+    		
+    		if(isDisabled === "false"){
+    			var thaaliDataObj = {};
+    			var thaaliDate =  $(this).attr('thaaliDate');
+    			
+    			var btnValue =  $(buttonId)[0].value;
+    			//we need to toggle the button values..
+    			if(btnValue == "Not Requested"){
+    				$(buttonId)[0].value = "Requested";
+    				$(buttonId).jqxToggleButton({template:requestedButtonTemplate});
+    				thaaliDataObj.userThaaliStatus = "REQUESTED_BY_USER";			
+    			}else{
+    				$(buttonId)[0].value = "Not Requested";			
+    				$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});
+    				thaaliDataObj.userThaaliStatus = "NOT_REQUESTED_BY_USER";
+    			}
+    			thaaliDataObj.thaaliDate = new Date(thaaliDate);
+    			thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
+    			//Updating the array of thaali data objects.
+    			userThaaliSignupArr.push(thaaliDataObj);
+    		}else{
+    			//Depending upon the screen size we also need to display the message why it is disabled..
+    			var msg = $(this).attr('message');
+    			var toolTipId = buttonId+"toolTip";
+    			$(toolTipId).jqxTooltip({
+    				position : 'top',
+    				content : msg,
+    				theme : themeName
+    			});
+    		}
+    	    }); */
+
+
+    	$("#submitUserThaaliDataButton").on('click', function () {    	
+    		if(userThaaliSignupArr.length > 0){
+    			//Updating DB only when there is something to update.
+    			var url=user_thaali_update_service_url;
+    			var jsonData = new Object(); 
+    			//Populating the json object..
+    			var mRowArr =  new Array();
+    			jsonData.eJamaatId = getEjamaatId();
+    			jsonData.password = getPassword();
+    			
+    			jsonData.dataList = userThaaliSignupArr;
+    			jsonData = JSON.stringify(jsonData);//we"ll have to stringify the object before sending it over the wire.
+    			$.ajax({
+    				url:url,
+    				dataType:'json',
+    				data: jsonData,
+    				contentType: "application/json",
+    				type:'POST',
+    				success:function(){
+    					display(successMsg);
+    				},
+    				error: function(){
+    					display(errorMsg);    				
+    				}
+    			});
+    		}
+    		userThaaliSignupArr = new Array(); //reset it to blank once everything is updated in the database.
+    	});
+
 		
 	}else{
 		$('#thaaliCalendarErrorCallout').html("<h4>An error has occurred!</h4><p>Service is unavailable at this time. Please try again later</p>");
 		$('#thaaliCalendarErrorCallout').show();
 	}
 	
+
+	
+	
+}
+
+
+toggleUserThaaliStatus = function(jqxButtonArr){
+  if(jqxButtonArr != null && jqxButtonArr.length > 0){
+	  for(var i =0;i<jqxButtonArr.length;i++){
+		  var jqxButtonObj = jqxButtonArr[i];
+		  $("#"+jqxButtonObj.buttonId).jqxToggleButton({ width: '85%', height: '50%', toggled: true, disabled: jqxButtonObj.disabled, roundedCorners: 'all', template: jqxButtonObj.buttonTemplate});
+		  //$("#"+jqxButtonObj.buttonId).jqxSwitchButton({ width: '75%', height: '40%',  theme: themeName, disabled: jqxButtonObj.isDisabled, onLabel: jqxButtonObj.userStatus});
+	  }	  
+  }
+  
+  	
 }
 
 

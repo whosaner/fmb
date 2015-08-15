@@ -12,25 +12,31 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.daawat.fmb.api.db.ThaaliCookDAO;
 import org.daawat.fmb.api.db.ThaaliDataDAO;
 import org.daawat.fmb.api.db.ThaaliFeedbackDAO;
 import org.daawat.fmb.api.db.ThaaliMenuDAO;
 import org.daawat.fmb.api.db.ThaaliRegionDAO;
 import org.daawat.fmb.api.db.UserProfileDataDAO;
+import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.UserRole;
+import org.daawat.fmb.api.objects.FmbMailMessage;
 import org.daawat.fmb.api.objects.Request;
 import org.daawat.fmb.api.objects.Response;
+import org.daawat.fmb.api.objects.ThaaliCook;
 import org.daawat.fmb.api.objects.ThaaliData;
 import org.daawat.fmb.api.objects.ThaaliFeedback;
 import org.daawat.fmb.api.objects.ThaaliMenu;
 import org.daawat.fmb.api.objects.ThaaliRegion;
 import org.daawat.fmb.api.objects.UserProfileData;
+import org.daawat.fmb.impl.daos.ThaaliCookDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliDataDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliFeedbackDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliMenuDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliRegionDAOImpl;
 import org.daawat.fmb.impl.daos.UserProfileDataDAOImpl;
 import org.daawat.fmb.utils.Logger;
+import org.daawat.fmb.utils.PropertyFileManager;
 import org.daawat.fmb.utils.Utils;
 
 @Path("/admin")
@@ -288,9 +294,10 @@ public class AdminThaaliDataService extends BaseService{
 					Date thaaliDate = thaaliData.getThaaliDate();
 					boolean isMatched = false;
 					int returnVal = 0;
+					ThaaliData thaaliDataDB = null;
 					if(!Utils.isNullOrEmpty(thaaliDataList)){
 						for(int j=0;j<thaaliDataList.size();j++){
-							ThaaliData thaaliDataDB = thaaliDataList.get(j);
+							thaaliDataDB = thaaliDataList.get(j);
 							Date thaaliDateInDB = thaaliDataDB.getThaaliDate();
 							if(thaaliDate.compareTo(thaaliDateInDB) == 0){
 								//Means we need to update.
@@ -307,8 +314,13 @@ public class AdminThaaliDataService extends BaseService{
 						//INvoking the ThaaliDataDAO Impl with the thaali data, the DAO will insert a row in the DB.												
 						returnVal =thaaliDataDAO.createThaaliData(thaaliData);
 					}
+		
+					isError = isOperationSuccessful(returnVal, msg, "User Thaali Data for user with eJamaatId - "+eJamaatId+" and thaali date"+thaaliDate);
 					
-					isError = isOperationSuccessful(returnVal, msg, "User Thaali Data for user with eJamaatId - "+eJamaatId+" and thaali date"+thaaliDate);						
+					if(!isError){
+						//We now need to send an email to the cook to notify of the changes which can be either menu change or cook change or no thaali on that day...
+						sendNotification(thaaliDataDB, thaaliData);
+					}
 				}
 
 			}			
@@ -319,6 +331,60 @@ public class AdminThaaliDataService extends BaseService{
 		}
 		
 		return new Response<ThaaliData>(msg, isError);
+	}
+	
+	public void sendNotification(ThaaliData othaaliData, ThaaliData uThaaliData) throws Exception{
+		String subject = PropertyFileManager.getProperty("mail.cook.notification.subject");
+		String mailBody = PropertyFileManager.getProperty("mail.cook.notification.body");
+		ThaaliCookDAO thaaliCookDAO = new ThaaliCookDAOImpl();
+		List<ThaaliCook> thaaliCooks = thaaliCookDAO.getCooks();
+		boolean sendEmail = false;
+		String cookName = null;
+		
+		if(othaaliData == null){
+			//means that this is a brand new row and we need to inform the cook..provided there is a row in the database for the cookName
+			sendEmail = true;
+		}else{
+			//we need to notify only if the menu has changed, cook has changed or no thaali on that day
+			if(!uThaaliData.getMenu().equalsIgnoreCase(othaaliData.getMenu())){
+				//Means menu has changed we need to inform the cook..
+				//check if there is significant change in the menu. addition of tabs/space should not trigger a notification
+				sendEmail = true;
+			}
+			if(!uThaaliData.getCookName().equalsIgnoreCase(othaaliData.getCookName())){
+				//Means cook has changed..see if the new cook has registered to receive notifications.
+				//TODO we need to inform the old cook about the change as well..
+				sendEmail = true;
+			}
+		}
+		if(sendEmail){
+			FmbMailMessage mailMsg = new FmbMailMessage();
+			mailMsg.setSubject(subject);
+			cookName = uThaaliData.getCookName();
+			String menu = uThaaliData.getMenu();
+			String thaaliDate = uThaaliData.getThaaliDate().toString();
+			String jaman = thaaliDate + ", and the menu is " + menu;
+			//check if user has asked to send email alerts...
+			for(ThaaliCook thaaliCook: thaaliCooks){
+				if(thaaliCook.getCookName().equalsIgnoreCase(cookName)){
+					if(EmailType.ALL.equals(thaaliCook.getEmailType())){
+						MailService mailService = new MailService();
+						//send email..we have to construct a FMBMessage here.						
+						mailBody = mailBody.replace("${cookName}", cookName);
+						mailBody = mailBody.replace("${jaman}", jaman);
+						mailMsg.setBody(mailBody);
+						mailMsg.setToEmailAddresses(thaaliCook.getEmailAddress());
+						mailService.prepareToSendEmail(mailMsg);
+						Logger.info(COMP_NAME, "Successfully sent an email to - "+thaaliCook.getEmailAddress());						
+					}
+					else{
+						Logger.info(COMP_NAME, "Not sending an email to - "+thaaliCook.getEmailAddress()+", since user does not want email notifications");		
+					}
+					break;
+				}
+			}
+		}
+		
 	}
 	
 	

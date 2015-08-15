@@ -55,7 +55,7 @@ public class MailService extends BaseService{
 			
 			//AUthenticate the user first..
 			authenticateUser(eJamaatId, password);
-			prepareToSendEmail(requestObj.getDataList().get(0));
+			prepareToSendEmailToJamaat(requestObj.getDataList().get(0));
 		}catch(Exception e){
 			msg += "An exception occurred while sending email, stacktrace is "+e.getMessage();
 			Logger.error(COMP_NAME,msg);
@@ -65,19 +65,10 @@ public class MailService extends BaseService{
 		return new Response<FmbMailMessage>(msg, isError);
 	}
 	
-	private void prepareToSendEmail(FmbMailMessage msg) throws Exception{
-		final String username = PropertyFileManager.getProperty("mail.username");
-		final String password = PropertyFileManager.getProperty("mail.password");
-		final String headerImg = PropertyFileManager.getProperty("mail.header.img");		
-		final String footer = PropertyFileManager.getProperty("mail.footer");
-		final String subject = msg.getSubject();
-		final String htmlMsgBody = msg.getBody();
-		final MailToType mailToType = msg.getMailTo();
-		
-		
+	private void prepareToSendEmailToJamaat(FmbMailMessage msg) throws Exception{
+	    final MailToType mailToType = msg.getMailTo();
+				
 		StringBuilder emailAddresses = new StringBuilder();
-		StringBuilder htmlMsgContent = new StringBuilder();
-		
 		UserProfileDataDAO userProfileDAO = new UserProfileDataDAOImpl();
 		List<UserProfileData> userProfiles = userProfileDAO.getAllUsers();
 		
@@ -99,8 +90,21 @@ public class MailService extends BaseService{
 				emailAddresses.append(userProfile.getEmailAddresses());
 			}
 		}
+		msg.setToEmailAddresses(emailAddresses.toString());
+		prepareToSendEmail(msg);
+	}
+	
+	public void prepareToSendEmail(FmbMailMessage msg) throws Exception{
+		final String username = PropertyFileManager.getProperty("mail.username");
+		final String password = PropertyFileManager.getProperty("mail.password");
+		final String headerImg = PropertyFileManager.getProperty("mail.header.img");		
+		final String footer = PropertyFileManager.getProperty("mail.footer");
+		final String subject = msg.getSubject();
+		final String htmlMsgBody = msg.getBody();
 		
 		
+		StringBuilder htmlMsgContent = new StringBuilder();
+
 		Properties props = new Properties();
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
@@ -154,12 +158,12 @@ public class MailService extends BaseService{
 			Message message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(PropertyFileManager.getProperty("mail.email.from")));
 			message.setRecipients(Message.RecipientType.BCC,
-				InternetAddress.parse(emailAddresses.toString(), false));
+				InternetAddress.parse(msg.getToEmailAddresses(), false));
 			message.setSubject(subject);			
 			message.setContent(content);			
 			Transport.send(message);
  
-			Logger.info(COMP_NAME, "Successfully emailed to following emailAddress'es - "+emailAddresses.toString()+", HTML msg is "+htmlMsgContent.toString());
+			Logger.info(COMP_NAME, "Successfully emailed to following emailAddress'es - "+msg.getToEmailAddresses()+", HTML msg is "+htmlMsgContent.toString());
  
 		} catch (MessagingException e) {
 			e.printStackTrace();

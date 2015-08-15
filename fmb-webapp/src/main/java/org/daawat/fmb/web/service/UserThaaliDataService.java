@@ -233,7 +233,10 @@ public class UserThaaliDataService extends BaseService{
 									if(!Utils.isNullOrEmpty(userThaaliDataList)){
 										//Means row exists we need to update.
 										UserThaaliData userThaaliDataDB = userThaaliDataList.get(0); //getting the first and the only object..
-										userThaaliDataDB.setThaaliCategory(userThaaliData.getThaaliCategory());
+										if(userThaaliData.getThaaliCategory() != null){
+											//since this is an optional field..
+											userThaaliDataDB.setThaaliCategory(userThaaliData.getThaaliCategory());
+										}										
 										userThaaliDataDB.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
 										userThaaliDataDB.setUserInstructions(userThaaliData.getUserInstructions());
 										returnVal = userThaaliDAO.updateUserThaaliData(userThaaliDataDB);							

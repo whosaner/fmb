@@ -3703,3 +3703,10 @@ color: rgb(83, 83, 138);
 .wysiwyg-color-orange {
   color: orange;
 }
+
+/** This is done to change the background color of the full calendar columns***/
+.fc-day{
+	/*background-color: rgba(97, 192, 218, 0.13);*/
+	background-color: #f9f9f9;
+}
+

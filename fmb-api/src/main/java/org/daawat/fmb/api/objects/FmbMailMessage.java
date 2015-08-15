@@ -22,10 +22,15 @@ public class FmbMailMessage implements Serializable{
 	private List<byte[]> mailAttachments;
 	private MailToType mailTo;
 	private EmailType emailType; //fmb, miqaat
+	private String toEmailAddresses;
 	
 	
-	
-	
+	public String getToEmailAddresses() {
+		return toEmailAddresses;
+	}
+	public void setToEmailAddresses(String toEmailAddresses) {
+		this.toEmailAddresses = toEmailAddresses;
+	}
 	public String getSubject() {
 		return subject;
 	}
