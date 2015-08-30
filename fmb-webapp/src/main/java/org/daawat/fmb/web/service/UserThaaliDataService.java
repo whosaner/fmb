@@ -110,7 +110,7 @@ public class UserThaaliDataService extends BaseService{
 						UserThaaliView userThaaliView = new UserThaaliView();
 						if(!isMatched){
 							//Means we didn't find a match..we need to create a new UserThaaliData object.
-							userThaaliData = new UserThaaliData(thaaliDate, userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), UserThaaliStatus.NOT_REQUESTED_BY_USER, familyGroupId, "", userProfileData.getLocation());
+							userThaaliData = new UserThaaliData(thaaliDate, userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.NOT_REQUESTED_BY_USER, familyGroupId, "", userProfileData.getLocation());
 						}
 						
 						//Check if Thaali is present for the particular day, there can be a scenario where the admin wants the jamaat to know that there is no
@@ -233,16 +233,17 @@ public class UserThaaliDataService extends BaseService{
 									if(!Utils.isNullOrEmpty(userThaaliDataList)){
 										//Means row exists we need to update.
 										UserThaaliData userThaaliDataDB = userThaaliDataList.get(0); //getting the first and the only object..
-										if(userThaaliData.getThaaliCategory() != null){
-											//since this is an optional field..
-											userThaaliDataDB.setThaaliCategory(userThaaliData.getThaaliCategory());
-										}										
+										/* the below fields (thaali category and rice) are not visible on the thaali signup sheet..so whenever an update is made to that day thaali, 
+										 * we pick this value latest from the USER_PROFILE_TABLE*/
+										userThaaliDataDB.setThaaliCategory(userProfileData.getThaaliCategory());
+										userThaaliDataDB.setRice(userProfileData.getRice());
+										
 										userThaaliDataDB.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
 										userThaaliDataDB.setUserInstructions(userThaaliData.getUserInstructions());
 										returnVal = userThaaliDAO.updateUserThaaliData(userThaaliDataDB);							
 									}else{
 										//Row does not exist
-										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userThaaliData.getThaaliCategory(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, userThaaliData.getUserInstructions(), userProfileData.getLocation());
+										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, userThaaliData.getUserInstructions(), userProfileData.getLocation());
 										returnVal = userThaaliDAO.addUserThaaliData(userThaaliDataDB);					
 									}
 									
@@ -460,6 +461,7 @@ public class UserThaaliDataService extends BaseService{
 					isMatched = true;	
 					userThaaliDayWiseData.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
 					userThaaliDayWiseData.setThaaliCategory(userThaaliData.getThaaliCategory());
+					userThaaliDayWiseData.setRice(userThaaliData.getRice());
 					break;
 				}
 			}

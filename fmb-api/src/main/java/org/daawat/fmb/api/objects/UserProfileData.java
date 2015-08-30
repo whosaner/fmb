@@ -22,7 +22,7 @@ public class UserProfileData implements Serializable{
 	private UserRole userRole; //different user roles (user, admin, super user)
 	private Category thaaliCategory; //thaali category (small, medium, large)
 	private String location; //user location
-	
+	private String rice; //DOes the user want Rice (value are Yes, No)
 	//A group if which will be unique for all the members in a family. 
 	//This is needed to club a particular family member to a specific group.
 	private int familyGroupId;
@@ -40,15 +40,15 @@ public class UserProfileData implements Serializable{
 
 	public UserProfileData(UserCredentialData userCredentials,
 			String hofEJamaatId, String familyName, String firstName,
-			UserRole userRole, Category thaaliCategory, String location,
+			UserRole userRole, Category thaaliCategory, String rice, String location,
 			int familyGroupId) {
-		this(userCredentials, hofEJamaatId, familyName, firstName, userRole, thaaliCategory, location);
+		this(userCredentials, hofEJamaatId, familyName, firstName, userRole, thaaliCategory, rice, location);
 		this.familyGroupId = familyGroupId;
 	}
 	
 	public UserProfileData(UserCredentialData userCredentials,
 			String hofEJamaatId, String familyName, String firstName,
-			UserRole userRole, Category thaaliCategory, String location) {
+			UserRole userRole, Category thaaliCategory, String rice, String location) {
 		super();
 		this.userCredentials = userCredentials;
 		this.hofEJamaatId = hofEJamaatId;
@@ -56,6 +56,7 @@ public class UserProfileData implements Serializable{
 		this.firstName = firstName;
 		this.userRole = userRole;
 		this.thaaliCategory = thaaliCategory;
+		this.rice = rice;
 		this.location = location;
 	}
 
@@ -122,7 +123,15 @@ public class UserProfileData implements Serializable{
 		this.familyGroupId = familyGroupId;
 	}
 	
-	
+
+	public String getRice() {
+		return rice;
+	}
+
+	public void setRice(String rice) {
+		this.rice = rice;
+	}
+
 	public String getLocation() {
 		return location;
 	}
@@ -163,6 +172,7 @@ public class UserProfileData implements Serializable{
 		objList.add(firstName);
 		objList.add(userRole.getValue());
 		objList.add(thaaliCategory.getValue());
+		objList.add(rice);
 		objList.add(familyGroupId);
 		objList.add(location);
 		objList.add(emailAddresses);
@@ -177,6 +187,7 @@ public class UserProfileData implements Serializable{
 		objList.add(familyName);
 		objList.add(firstName);
 		objList.add(thaaliCategory.getValue());
+		objList.add(rice);
 		objList.add(location);
 		objList.add(emailAddresses);		
 		objList.add(userCredentials.geteJamaatId());
@@ -184,16 +195,19 @@ public class UserProfileData implements Serializable{
 		return objList;
 		
 	}
-
+	
 	@Override
 	public String toString() {
 		return "UserProfileData [userCredentials=" + userCredentials
 				+ ", hofEJamaatId=" + hofEJamaatId + ", familyName="
 				+ familyName + ", firstName=" + firstName + ", userRole="
 				+ userRole + ", thaaliCategory=" + thaaliCategory
-				+ ", location=" + location + ", emailAddresses=" + emailAddresses + ", familyGroupId=" + familyGroupId
-				+ "]";
+				+ ", location=" + location + ", rice=" + rice
+				+ ", familyGroupId=" + familyGroupId + ", emailAddresses="
+				+ emailAddresses + ", emailType=" + emailType + "]";
 	}
+
+	
 
 	
 	

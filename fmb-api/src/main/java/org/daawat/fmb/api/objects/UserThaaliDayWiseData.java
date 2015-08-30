@@ -11,6 +11,8 @@ public class UserThaaliDayWiseData implements Serializable{
 	private static final long serialVersionUID = 1L;
 	protected Date thaaliDate; //date for which user has selected the thaali.	
 	protected Category thaaliCategory; //category for thaali
+	protected String rice;
+	
 	protected UserThaaliStatus userThaaliStatus = UserThaaliStatus.NOT_REQUESTED_BY_USER; //status which tell if the thaali (is requested/cancelled)	
 	protected String userThaaliDate; //used in order to convert the string date to date object.
 	protected String menu;
@@ -44,6 +46,12 @@ public class UserThaaliDayWiseData implements Serializable{
 	}
 	public void setMenu(String menu) {
 		this.menu = menu;
+	}
+	public String getRice() {
+		return rice;
+	}
+	public void setRice(String rice) {
+		this.rice = rice;
 	}
 	
 	

@@ -114,6 +114,7 @@ public class UserThaaliDataDAOImpl extends BaseJDBCDAO<UserThaaliData> implement
 			userThaali.setFirstName(rs.getString("FIRST_NAME"));
 			userThaali.setFamilyName(rs.getString("FAMILY_NAME"));
 			userThaali.setThaaliCategory(Category.getEnum(rs.getString("THAALI_CATEGORY")));
+			userThaali.setRice(rs.getString("RICE"));
 			userThaali.setUserThaaliStatus(UserThaaliStatus.getEnum(rs.getString("USER_THAALI_STATUS")));
 			userThaali.setFamilyGroupId(rs.getInt("FAMILY_GROUP_ID"));
 			userThaali.setUserInstructions(rs.getString("INSTRUCTIONS"));

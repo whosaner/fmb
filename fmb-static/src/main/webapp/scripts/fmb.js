@@ -486,17 +486,41 @@ onLoadThaaliSchedule = function () {
            
             
             //Defining the fromDate field
-            $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+            //$("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
             
             //Defining the toDate field
-            $("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+            //$("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+            
+          //From date
+            $("#fromDate").datepicker({"format": "mm/dd/yyyy"});
+            $("#fromDate").attr("value",getFormattedDate(new Date()));
+         	 
+            //To date
+            $("#toDate").datepicker({"format": "mm/dd/yyyy"});   
+            $("#toDate").attr("value",getFormattedDate(toDate));
+
+            $('#fromDate').datepicker()
+           	.on('changeDate', function(e){
+           		//hide the datepicker
+           		$("#fromDate").datepicker('hide');
+            });
+           
+            $('#toDate').datepicker()
+          	.on('changeDate', function(e){
+          		//hide the datepicker
+          		$("#toDate").datepicker('hide');
+            });
             
             //Defining a custom validator for the date field's
             $('#adminDateFieldForm').jqxValidator({
             	hintType: 'label',
             	onSuccess: function () {
-            		var fromDate = $('#fromDate').jqxDateTimeInput('value');
-                    var toDate = $('#toDate').jqxDateTimeInput('value');
+            		//var fromDate = $('#fromDate').jqxDateTimeInput('value');
+                    //var toDate = $('#toDate').jqxDateTimeInput('value');
+            		
+            		 var fromDate = new Date($('#fromDate').val());           
+                     var toDate = new Date($('#toDate').val());
+                     
                 	//On success we need to refresh the thaali data.
             		source.url =  createAdminThaaliDataGetUrl(fromDate, toDate);
                     $("#jqxAdminThaaliDataGrid").jqxGrid('updatebounddata');
@@ -505,8 +529,10 @@ onLoadThaaliSchedule = function () {
             	rules: [            
                 { 
                 	input: '#fromDate', message: 'Invalid Date. From Date cannot be greater than To Date.', action: 'valuechanged', rule:  function (input, commit){
-                    var fromDate = $('#fromDate').jqxDateTimeInput('value');
-                    var toDate = $('#toDate').jqxDateTimeInput('value');
+                    //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+                    //var toDate = $('#toDate').jqxDateTimeInput('value');
+                	var fromDate = new Date($('#fromDate').val());           
+                    var toDate = new Date($('#toDate').val());
                     
                     if(fromDate != null && toDate != null){
                     	if(fromDate.getTime() > toDate.getTime()){
@@ -520,8 +546,10 @@ onLoadThaaliSchedule = function () {
                 },                                   
                 
                 { input: '#toDate', message: 'Invalid Date. To Date cannot be smaller than From Date.', action: 'valuechanged', rule:  function (input, commit){
-                    var fromDate = $('#fromDate').jqxDateTimeInput('value');
-                    var toDate = $('#toDate').jqxDateTimeInput('value');
+                    //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+                    //var toDate = $('#toDate').jqxDateTimeInput('value');
+                	var fromDate = new Date($('#fromDate').val());           
+                    var toDate = new Date($('#toDate').val());
                     
                     if(fromDate != null && toDate != null){
                     	if(fromDate.getTime() > toDate.getTime()){
@@ -776,6 +804,7 @@ onLoadThaaliSchedule = function () {
 
 /**
  * This method would be invoked by the onload method on the user thaali page.
+ * @deprecated - see onLoadThaaliCalendar
  */
 onLoadUserThaaliView = function(){
 	
@@ -1220,10 +1249,10 @@ onLoadUserThaaliView = function(){
 
 /****************************** Thaali Count functionality starts here *************************************************************************/
 
-onLoadThaaliCount = function(){
+onLoadThaaliCount = function(){ 
 
 	var gridName = "#jqxThaaliCountGrid";
-	var num_of_days_to_Advance = 7; //user thaali count by default to display only 7 days.
+	var num_of_days_to_Advance = 30; //user thaali count 
 	 //Initializing a popup window, we would need this to display any success/error messages.
 	$("#thaaliCountMsgPopup").jqxWindow({ width: 500, height: 100 , autoOpen:false, theme:themeName});
 	
@@ -1232,14 +1261,32 @@ onLoadThaaliCount = function(){
    //get the service url
    var currentDate = new Date();
    var toDate =  new Date();
-   var yesterday = new Date();
+   var yesterday = new Date();	
    var initialRowsLoadedFromDatabase = -1; 
    
    yesterday.setDate(yesterday.getDate() - 1);
    toDate.setDate(toDate.getDate() + num_of_days_to_Advance);
    
-   //var url = createUserThaaliDataGetUrl(currentDate, toDate);
+   //From date
+   $("#fromDate").datepicker({"format": "mm/dd/yyyy"});
+   $("#fromDate").attr("value",getFormattedDate(new Date()));
+	 
+   //To date
+   $("#toDate").datepicker({"format": "mm/dd/yyyy"});   
+   $("#toDate").attr("value",getFormattedDate(toDate));
 
+   $('#fromDate').datepicker()
+  	.on('changeDate', function(e){
+  		//hide the datepicker
+  		$("#fromDate").datepicker('hide');
+   });
+  
+   $('#toDate').datepicker()
+ 	.on('changeDate', function(e){
+ 		//hide the datepicker
+ 		$("#toDate").datepicker('hide');
+   });
+  
    // prepare the data
    var source =
    {
@@ -1318,28 +1365,39 @@ onLoadThaaliCount = function(){
    
    
    //Defining the fromDate field
-   $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+  // $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+   
    
    //Defining the toDate field
-   $("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+   //$("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+     
+   
+   
    
    //Defining a custom validator for the date field's
    $('#thaaliCountForm').jqxValidator({
 	   hintType: 'label',
    	onSuccess: function () {
    		//var fromDate = $('#fromDate').jqxDateTimeInput('value');
-   		currentDate = $('#fromDate').jqxDateTimeInput('value');
-        toDate = $('#toDate').jqxDateTimeInput('value');
+   		//currentDate = $('#fromDate').jqxDateTimeInput('value');
+        //toDate = $('#toDate').jqxDateTimeInput('value');
+        
+   		currentDate = new Date($('#fromDate').val());
+   		toDate = new Date($('#toDate').val());
+        
        	//On success we need to refresh the thaali data.
-        source.url = createThaaliCountGetUrl(currentDate, toDate);            
+        source.url = createThaaliCountGetUrl(currentDate, toDate);
         $(gridName).jqxGrid('updatebounddata');         
    		
    	},
    	rules: [            
        { 
        	input: '#fromDate', message: 'Invalid Date. From Date cannot be greater than To Date.', action: 'valuechanged', rule:  function (input, commit){
-           var fromDate = $('#fromDate').jqxDateTimeInput('value');
-           var toDate = $('#toDate').jqxDateTimeInput('value');
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+           
+           var fromDate = new Date($('#fromDate').val());           
+           var toDate = new Date($('#toDate').val());
            
            if(fromDate != null && toDate != null){
            	if(fromDate.getTime() > toDate.getTime()){
@@ -1353,8 +1411,11 @@ onLoadThaaliCount = function(){
        },                                   
        
        { input: '#toDate', message: 'Invalid Date. To Date cannot be smaller than From Date.', action: 'valuechanged', rule:  function (input, commit){
-           var fromDate = $('#fromDate').jqxDateTimeInput('value');
-           var toDate = $('#toDate').jqxDateTimeInput('value');
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+    	   
+    	   var fromDate = new Date($('#fromDate').val());
+           var toDate = new Date($('#toDate').val());
            
            if(fromDate != null && toDate != null){
            	if(fromDate.getTime() > toDate.getTime()){
@@ -1391,7 +1452,14 @@ onLoadViewThaaliAll = function(){
    //get the service url
    var currentDate = new Date();
    var toDate =  new Date();
-   toDate.setDate(toDate.getDate() + 1); //advancing one day ahead from currentdate.
+   
+   if(isMobileView()){
+	   //in case of mobile we will display only 2 columns.
+	   toDate.setDate(toDate.getDate() + 1); //advancing one day ahead from currentdate.
+   }else{
+	   toDate.setDate(toDate.getDate() + 7); //advancing seven day ahead from currentdate.
+   }
+   
    var columnNames = null;
    
    // prepare the data
@@ -1473,9 +1541,11 @@ onLoadViewThaaliAll = function(){
                   					columnNames.push({date: thaaliDate, menu: menu}); //format would be yyyy-mm-dd 
                   				}                  				
                   				if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_BY_USER"){
-                  					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory;             					
-                  				}else if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_WITH_NO_RICE"){
-                  					records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory+" "+"<sub>No Rice</sub>";                  					
+                  					if(thaaliDataDayWise.rice == "No"){
+                  						records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory+" "+"<sub>No Rice</sub>";     
+                  					}else{
+                  						records[i][thaaliDate] = thaaliDataDayWise.thaaliCategory;
+                  					}                  					     				
                   				}else{
                   					records[i][thaaliDate] = "No";
                   				}
@@ -1536,27 +1606,54 @@ onLoadViewThaaliAll = function(){
     });
       
    //Defining the fromDate field
-   $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+   //$("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
    
    //Defining the toDate field
-   $("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+  // $("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+   
+   //From date
+   $("#fromDate").datepicker({"format": "mm/dd/yyyy"});
+   $("#fromDate").attr("value",getFormattedDate(new Date()));
+	 
+   //To date
+   $("#toDate").datepicker({"format": "mm/dd/yyyy"});   
+   $("#toDate").attr("value",getFormattedDate(toDate));
+
+   $('#fromDate').datepicker()
+  	.on('changeDate', function(e){
+  		//hide the datepicker
+  		$("#fromDate").datepicker('hide');
+   });
+  
+   $('#toDate').datepicker()
+ 	.on('changeDate', function(e){
+ 		//hide the datepicker
+ 		$("#toDate").datepicker('hide');
+   });
    
    //Defining a custom validator for the date field's
    $('#userDateFieldForm').jqxValidator({
 	hintType: 'label',
    	onSuccess: function () {
    		//var fromDate = $('#fromDate').jqxDateTimeInput('value');
-   		currentDate = $('#fromDate').jqxDateTimeInput('value');
-           toDate = $('#toDate').jqxDateTimeInput('value');
+   		//currentDate = $('#fromDate').jqxDateTimeInput('value');
+       //toDate = $('#toDate').jqxDateTimeInput('value');
+        
+        currentDate = new Date($('#fromDate').val());           
+        toDate = new Date($('#toDate').val());
+        
        	//On success we need to refresh the thaali data.
-           source.url = createAllUserThaaliDataGetUrl(currentDate, toDate);            
-           $("#jqxAllUserThaaliDataGrid").jqxGrid('updatebounddata');   		
+         source.url = createAllUserThaaliDataGetUrl(currentDate, toDate);            
+         $("#jqxAllUserThaaliDataGrid").jqxGrid('updatebounddata');   		
    	},
    	rules: [            
        { 
        	input: '#fromDate', message: date_error_msg, action: 'valuechanged', rule:  function (input, commit){
-           var fromDate = $('#fromDate').jqxDateTimeInput('value');
-           var toDate = $('#toDate').jqxDateTimeInput('value');
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+           
+           var fromDate = new Date($('#fromDate').val());           
+           var toDate = new Date($('#toDate').val());
            
            if(fromDate != null && toDate != null){
            	if(fromDate.getTime() > toDate.getTime()){
@@ -1570,8 +1667,10 @@ onLoadViewThaaliAll = function(){
        }, 
        { 
           	input: '#fromDate', message: dat_diff_msg, action: 'valuechanged', rule:  function (input, commit){
-              var fromDate = $('#fromDate').jqxDateTimeInput('value');
-              var toDate = $('#toDate').jqxDateTimeInput('value');
+              //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+             // var toDate = $('#toDate').jqxDateTimeInput('value');
+          		var fromDate = new Date($('#fromDate').val());           
+                var toDate = new Date($('#toDate').val());
               
               var timeDiff = Math.abs(fromDate.getTime() - toDate.getTime());
         		var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
@@ -1584,8 +1683,11 @@ onLoadViewThaaliAll = function(){
           
        
        { input: '#toDate', message: date_error_msg, action: 'valuechanged', rule:  function (input, commit){
-           var fromDate = $('#fromDate').jqxDateTimeInput('value');
-           var toDate = $('#toDate').jqxDateTimeInput('value');
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+           
+           var fromDate = new Date($('#fromDate').val());           
+           var toDate = new Date($('#toDate').val());
            
            if(fromDate != null && toDate != null){
            	if(fromDate.getTime() > toDate.getTime()){
@@ -1599,8 +1701,12 @@ onLoadViewThaaliAll = function(){
        },
        
        { input: '#toDate', message: dat_diff_msg, action: 'valuechanged', rule:  function (input, commit){
-           var fromDate = $('#fromDate').jqxDateTimeInput('value');
-           var toDate = $('#toDate').jqxDateTimeInput('value');
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+           
+           var fromDate = new Date($('#fromDate').val());           
+           var toDate = new Date($('#toDate').val());
+           
            //the difference of days should not be more than 5 calendar days.
       		var timeDiff = Math.abs(fromDate.getTime() - toDate.getTime());
       		var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)); 
@@ -1900,6 +2006,7 @@ onLoadUserProfile = function(){
 			$('#firstName').val(userProfileObj.firstName);
 			$('#familyName').val(userProfileObj.familyName);
 			$('#tCategory').val(userProfileObj.thaaliCategory);
+			$('#tRice').val(userProfileObj.rice);
 			$('#tDelivery').val(userProfileObj.location);
 			$('#userRole').val(userProfileObj.userRole);
 			$('#emailIp').val(userProfileObj.emailAddresses);
@@ -1924,6 +2031,7 @@ onLoadUserProfile = function(){
 			var firstName = $('#firstName').val();
 			var familyName = $('#familyName').val();
 			var tCategory = $('#tCategory').val();
+			var tRice = $('#tRice').val();
 			var tDelivery = $('#tDelivery').val();
 			var userRole = $('#userRole').val();
 			var emailAddress = $('#emailIp').val();
@@ -1939,6 +2047,7 @@ onLoadUserProfile = function(){
 				"firstName" : firstName,
 				"location" : tDelivery,
 				"thaaliCategory" : tCategory,
+				"rice":tRice,
 				"userRole" : userRole,
 				"emailAddresses":emailAddress
 			};
@@ -2293,7 +2402,9 @@ function display(msg){
  * @returns {Boolean}
  */
 function isMobileView(){
-	if ($(window).width() <= 992) {
+	var mobileTabletWidth = 992;
+	var mobileWidth = 500;
+	if ($(window).width() <= mobileWidth) {
         return true;
     }else{
     	return false;
@@ -2819,7 +2930,9 @@ onLoadThaaliCalendar = function(){
         			thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
         			thaaliDataObj.thaaliCategory = $(this).attr('category');
         			//Updating the array of thaali data objects.
-        			userThaaliSignupArr.push(thaaliDataObj);
+        			//userThaaliSignupArr.push(thaaliDataObj);
+        			//We will now save individual rows instead of a big-bang
+        			updateUserThaaliData(thaaliDataObj);
         		}else{
         			//Depending upon the screen size we also need to display the message why it is disabled..
         			var msg = $(this).attr('message');
@@ -2909,9 +3022,6 @@ onLoadThaaliCalendar = function(){
 		$('#thaaliCalendarErrorCallout').show();
 	}
 	
-
-	
-	
 }
 
 
@@ -2927,6 +3037,34 @@ toggleUserThaaliStatus = function(jqxButtonArr){
   	
 }
 
+/**
+ * Method that will be used to update the user thaali data.
+ * @param userThaaliDataObj
+ */
+updateUserThaaliData = function(userThaaliDataObj){	
+	var userThaaliSignupArr = new Array();
+	userThaaliSignupArr.push(userThaaliDataObj);
+	//Updating DB only when there is something to update.
+	var url=user_thaali_update_service_url;
+	var jsonData = new Object(); 
+	//Populating the json object..
+	var mRowArr =  new Array();
+	jsonData.eJamaatId = getEjamaatId();
+	jsonData.password = getPassword();
+	
+	jsonData.dataList = userThaaliSignupArr;
+	jsonData = JSON.stringify(jsonData);//we"ll have to stringify the object before sending it over the wire.
+	$.ajax({
+		url:url,
+		dataType:'json',
+		data: jsonData,
+		contentType: "application/json",
+		type:'POST',		
+		error: function(){
+			display(errorMsg);    				
+		}
+	});
+}
 
 /****************** Email functionality ****************************/
 

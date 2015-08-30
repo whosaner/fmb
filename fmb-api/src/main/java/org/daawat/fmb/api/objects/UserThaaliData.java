@@ -24,6 +24,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 	protected String firstName; 
 	protected String familyName;
 	protected Category thaaliCategory; //category for thaali
+	private String rice; //does user want rice?
 	protected UserThaaliStatus userThaaliStatus; //status which tell if the thaali (is requested/cancelled)
 	protected int familyGroupId; //groupId which tells the group for the particular user.
 	protected String userInstructions; //specific instructions set by the user for that day thaali.
@@ -32,19 +33,22 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 	
 	
 	
+
+
 	public UserThaaliData() {
 		super();
 	}
 
 
 	public UserThaaliData(Date thaaliDate, String firstName, String familyName,
-			Category thaaliCategory, UserThaaliStatus thaaliStatus, int familyGroupId,
+			Category thaaliCategory, String rice, UserThaaliStatus thaaliStatus, int familyGroupId,
 			String instructions, String location) {
 		super();
 		this.thaaliDate = thaaliDate;
 		this.firstName = firstName;
 		this.familyName = familyName;
 		this.thaaliCategory = thaaliCategory;
+		this.rice = rice;
 		this.userThaaliStatus = thaaliStatus;
 		this.familyGroupId = familyGroupId;
 		this.userInstructions = instructions;
@@ -64,6 +68,14 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		return firstName;
 	}
 	
+
+	public String getRice() {
+		return rice;
+	}
+
+	public void setRice(String rice) {
+		this.rice = rice;
+	}
 	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
@@ -149,6 +161,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		objList.add(firstName);
 		objList.add(familyName);
 		objList.add(thaaliCategory.getValue());
+		objList.add(rice);
 		objList.add(userThaaliStatus.getValue());		
 		objList.add(userInstructions);
 		objList.add(location);
@@ -162,6 +175,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		objList.add(firstName);
 		objList.add(familyName);
 		objList.add(thaaliCategory.getValue());
+		objList.add(rice);
 		objList.add(userThaaliStatus.getValue());
 		objList.add(userInstructions);
 		objList.add(location);
@@ -172,14 +186,18 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 	}
 
 
+	
+
+
 	@Override
 	public String toString() {
 		return "UserThaaliData [thaaliDate=" + thaaliDate + ", firstName="
 				+ firstName + ", familyName=" + familyName
-				+ ", thaaliCategory=" + thaaliCategory + ", userThaaliStatus="
-				+ userThaaliStatus + ", familyGroupId=" + familyGroupId
-				+ ", userInstructions=" + userInstructions + ", location="
-				+ location + ", userThaaliDate=" + userThaaliDate + "]";
+				+ ", thaaliCategory=" + thaaliCategory + ", rice=" + rice
+				+ ", userThaaliStatus=" + userThaaliStatus + ", familyGroupId="
+				+ familyGroupId + ", userInstructions=" + userInstructions
+				+ ", location=" + location + ", userThaaliDate="
+				+ userThaaliDate + "]";
 	}
 
 
