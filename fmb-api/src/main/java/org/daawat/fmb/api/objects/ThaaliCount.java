@@ -22,6 +22,12 @@ public class ThaaliCount implements Serializable{
 	private int numOfRiceCups; //size of 8 oz cups;
 	private String instructions;
 	
+	
+	private int numOfPpl; //number of mumineen attending the miqaat
+	private int approxNumOfThaals;
+	private int numOfRiceCupsMiqaat;
+	private String miqaatInstructions;
+	
 	public int getNumOfSmallThaalis() {
 		return numOfSmallThaalis;
 	}
@@ -70,7 +76,30 @@ public class ThaaliCount implements Serializable{
 	public void setTotalNumOfThaalis(int totalNumOfThaalis) {
 		this.totalNumOfThaalis = totalNumOfThaalis;
 	}
-	
+	public int getNumOfPpl() {
+		return numOfPpl;
+	}
+	public void setNumOfPpl(int numOfPpl) {
+		this.numOfPpl = numOfPpl;
+	}
+	public int getApproxNumOfThaals() {
+		return approxNumOfThaals;
+	}
+	public void setApproxNumOfThaals(int approxNumOfThaals) {
+		this.approxNumOfThaals = approxNumOfThaals;
+	}
+	public int getNumOfRiceCupsMiqaat() {
+		return numOfRiceCupsMiqaat;
+	}
+	public void setNumOfRiceCupsMiqaat(int numOfRiceCupsMiqaat) {
+		this.numOfRiceCupsMiqaat = numOfRiceCupsMiqaat;
+	}
+	public String getMiqaatInstructions() {
+		return miqaatInstructions;
+	}
+	public void setMiqaatInstructions(String miqaatInstructions) {
+		this.miqaatInstructions = miqaatInstructions;
+	}
 	
 	
 	

@@ -30,8 +30,12 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 	protected String userInstructions; //specific instructions set by the user for that day thaali.
 	protected String location; //user location 
 	protected String userThaaliDate; //used in order to convert the string date to date object.
+	protected Integer numOfPplAttending; //number of people attending the miqaat, null if no miqaat
 	
 	
+	
+
+
 	
 
 
@@ -42,7 +46,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 
 	public UserThaaliData(Date thaaliDate, String firstName, String familyName,
 			Category thaaliCategory, String rice, UserThaaliStatus thaaliStatus, int familyGroupId,
-			String instructions, String location) {
+			String instructions, String location, Integer numberOfPpl) {
 		super();
 		this.thaaliDate = thaaliDate;
 		this.firstName = firstName;
@@ -53,6 +57,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		this.familyGroupId = familyGroupId;
 		this.userInstructions = instructions;
 		this.location = location;
+		this.numOfPplAttending = numberOfPpl;
 	}
 	
 	
@@ -137,6 +142,14 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		return "";
 	}
 
+	public Integer getNumOfPplAttending() {
+		return numOfPplAttending;
+	}
+
+
+	public void setNumOfPplAttending(Integer numOfPplAttending) {
+		this.numOfPplAttending = numOfPplAttending;
+	}
 
 	public void setUserThaaliDate(String userThaaliDate) {
 		this.userThaaliDate = userThaaliDate;
@@ -165,6 +178,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		objList.add(userThaaliStatus.getValue());		
 		objList.add(userInstructions);
 		objList.add(location);
+		objList.add(numOfPplAttending);
 		
 		return objList;
 	}
@@ -179,6 +193,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 		objList.add(userThaaliStatus.getValue());
 		objList.add(userInstructions);
 		objList.add(location);
+		objList.add(numOfPplAttending);
 		objList.add(thaaliDate);//pk
 		objList.add(familyGroupId);//pk
 		
@@ -197,7 +212,7 @@ public class UserThaaliData implements Serializable,Comparable<UserThaaliData>{
 				+ ", userThaaliStatus=" + userThaaliStatus + ", familyGroupId="
 				+ familyGroupId + ", userInstructions=" + userInstructions
 				+ ", location=" + location + ", userThaaliDate="
-				+ userThaaliDate + "]";
+				+ userThaaliDate + "numOfPplAttending = "+ numOfPplAttending+"]";
 	}
 
 

@@ -52,6 +52,9 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 			thaaliCount.setThaaliDate(resultSet.getDate("THAALI_DATE"));
 			thaaliCount.setJamanQty(calculateJamanQty(small,medium,large));
 			
+			thaaliCount.setNumOfPpl(resultSet.getInt("NUM_OF_PPL"));
+			thaaliCount.setApproxNumOfThaals(thaaliCount.getNumOfPpl()/8);
+			thaaliCount.setMiqaatInstructions("Niyaaz jaman should consist of 1 khaaraas and 1 meethaas and no israaf.");
 			thaaliCount.setInstructions("");			
 			thaaliCounts.add(thaaliCount);			
 		}

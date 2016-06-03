@@ -28,7 +28,10 @@ public class UserProfileData implements Serializable{
 	private int familyGroupId;
 	private String emailAddresses = ""; //Comma separated list of email address.
 	private EmailType emailType; 
+	private int numOfFamilyMembers = 1; //number of family members which will be used for miqaat registration count -  default is 1
 
+
+	
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
@@ -41,9 +44,10 @@ public class UserProfileData implements Serializable{
 	public UserProfileData(UserCredentialData userCredentials,
 			String hofEJamaatId, String familyName, String firstName,
 			UserRole userRole, Category thaaliCategory, String rice, String location,
-			int familyGroupId) {
+			int familyGroupId, int memberCount) {
 		this(userCredentials, hofEJamaatId, familyName, firstName, userRole, thaaliCategory, rice, location);
 		this.familyGroupId = familyGroupId;
+		this.numOfFamilyMembers = memberCount;
 	}
 	
 	public UserProfileData(UserCredentialData userCredentials,
@@ -58,6 +62,7 @@ public class UserProfileData implements Serializable{
 		this.thaaliCategory = thaaliCategory;
 		this.rice = rice;
 		this.location = location;
+		
 	}
 
 	public UserCredentialData getUserCredentials() {
@@ -160,6 +165,14 @@ public class UserProfileData implements Serializable{
 	public void setEmailType(EmailType emailType) {
 		this.emailType = emailType;
 	}
+	
+	public int getNumOfFamilyMembers() {
+		return numOfFamilyMembers;
+	}
+
+	public void setNumOfFamilyMembers(int numOfFamilyMembers) {
+		this.numOfFamilyMembers = numOfFamilyMembers;
+	}
 
 	
 	
@@ -177,6 +190,7 @@ public class UserProfileData implements Serializable{
 		objList.add(location);
 		objList.add(emailAddresses);
 		objList.add(emailType.getValue());
+		objList.add(numOfFamilyMembers);
 		return objList;
 		
 	}
@@ -189,9 +203,11 @@ public class UserProfileData implements Serializable{
 		objList.add(thaaliCategory.getValue());
 		objList.add(rice);
 		objList.add(location);
-		objList.add(emailAddresses);		
+		objList.add(emailAddresses);
+		objList.add(numOfFamilyMembers);
 		objList.add(userCredentials.geteJamaatId());
 		objList.add(userCredentials.getPassword());
+		
 		return objList;
 		
 	}
@@ -204,7 +220,7 @@ public class UserProfileData implements Serializable{
 				+ userRole + ", thaaliCategory=" + thaaliCategory
 				+ ", location=" + location + ", rice=" + rice
 				+ ", familyGroupId=" + familyGroupId + ", emailAddresses="
-				+ emailAddresses + ", emailType=" + emailType + "]";
+				+ emailAddresses + ", emailType=" + emailType + "numOfFamilyMembers = "+numOfFamilyMembers+"]";
 	}
 
 	

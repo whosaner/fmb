@@ -25,6 +25,8 @@ public class UserThaaliView implements Serializable{
 	private Category userThaaliCategory; //category for thaali
 	private UserThaaliStatus userThaaliStatus; //status which tell if the thaali (is requested/cancelled)
 	private String userInstructions; //specific instructions set by the user for that day thaali.
+	
+	private Integer numOfFamilyMembers; //will be used for miqaat registration count
 		
 	
 	public UserThaaliView() {
@@ -90,7 +92,12 @@ public class UserThaaliView implements Serializable{
 	public void setUserInstructions(String userInstructions) {
 		this.userInstructions = userInstructions;
 	}
-
+	public Integer getNumOfFamilyMembers() {
+		return numOfFamilyMembers;
+	}
+	public void setNumOfFamilyMembers(Integer numOfFamilyMembers) {
+		this.numOfFamilyMembers = numOfFamilyMembers;
+	}
 
 
 	@Override
@@ -100,8 +107,12 @@ public class UserThaaliView implements Serializable{
 				+ isLocked + ", thaaliStatus=" + thaaliStatus + ", thaaliDate="
 				+ thaaliDate + ", userThaaliCategory=" + userThaaliCategory
 				+ ", userThaaliStatus=" + userThaaliStatus
-				+ ", userInstructions=" + userInstructions + "]";
+				+ ", userInstructions=" + userInstructions + "numOfFamilyMembers = "+numOfFamilyMembers+"]";
 	}
+
+
+
+	
 
 
 	

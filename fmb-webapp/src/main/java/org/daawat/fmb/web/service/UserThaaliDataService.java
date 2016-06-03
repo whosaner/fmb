@@ -110,7 +110,7 @@ public class UserThaaliDataService extends BaseService{
 						UserThaaliView userThaaliView = new UserThaaliView();
 						if(!isMatched){
 							//Means we didn't find a match..we need to create a new UserThaaliData object.
-							userThaaliData = new UserThaaliData(thaaliDate, userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.NOT_REQUESTED_BY_USER, familyGroupId, "", userProfileData.getLocation());
+							userThaaliData = new UserThaaliData(thaaliDate, userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.NOT_REQUESTED_BY_USER, familyGroupId, "", userProfileData.getLocation(),userProfileData.getNumOfFamilyMembers());
 						}
 						
 						//Check if Thaali is present for the particular day, there can be a scenario where the admin wants the jamaat to know that there is no
@@ -135,6 +135,7 @@ public class UserThaaliDataService extends BaseService{
 						userThaaliView.setUserInstructions(userThaaliData.getUserInstructions());
 						userThaaliView.setUserThaaliCategory(userThaaliData.getThaaliCategory());
 						userThaaliView.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
+						userThaaliView.setNumOfFamilyMembers(userThaaliData.getNumOfPplAttending());
 						
 						
 						userThaaliViewList.add(userThaaliView);						
@@ -240,10 +241,11 @@ public class UserThaaliDataService extends BaseService{
 										
 										userThaaliDataDB.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
 										userThaaliDataDB.setUserInstructions(userThaaliData.getUserInstructions());
+										userThaaliDataDB.setNumOfPplAttending(userThaaliData.getNumOfPplAttending());
 										returnVal = userThaaliDAO.updateUserThaaliData(userThaaliDataDB);							
 									}else{
 										//Row does not exist
-										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, userThaaliData.getUserInstructions(), userProfileData.getLocation());
+										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, userThaaliData.getUserInstructions(), userProfileData.getLocation(), userProfileData.getNumOfFamilyMembers());
 										returnVal = userThaaliDAO.addUserThaaliData(userThaaliDataDB);					
 									}
 									

@@ -86,7 +86,8 @@ var userFeedbackTblHeadersMobile=[{Name:"Creation <br/> Date", Width:"15%"},
 var thaaliCountTblHdr = {THAALI_DATE:"Date",TOTAL_THAALI:"Total", SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
 var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"Tot", SMALL_THAALI:"Sm", MEDIUM_THAALI:"Med", LARGE_THAALI:"Lg", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
 
-
+var miqaatCountTblHdr = {MIQAAT_DATE:"Miqaat Date", MUMINEEN_COUNT:"Mumineen count",APPROX_THAALS:"Approx Thaals", INSTRUCTIONS:"Instructions/ <br/> Guidelines"};
+	
 var maxRowsAllowedToBeAdded = 60;
 var rowLimit = 100; //gets the number of user feedback at one time.
 var themeName='fmb';
@@ -101,7 +102,7 @@ var dat_diff_msg = "The difference between from date and to date cannot be more 
 //Items that are present on the dashboard.
 var userDashboardArr = [["thaaliSignup","thaaliSignup.html"],["userProfile","userProfile.html"],["rotiKhidmat","rotiKhidmat.html"],["submitFeedback","submitFeedback.html"],["notification","notification.html"],["thaaliSchedule","thaaliSchedule.html"],
                         ["listThaaliSignups","listThaaliSignups.html"],["registerNewUser","registerNewUser.html"],["addMenu","addMenu.html"],["thaaliInformation","thaaliSchedule.html"],["viewFeedback","viewFeedback.html"],["thaaliCalendar","thaaliCalendar.html"],
-                        ["thaaliCount","thaaliCount.html"], ["sendMail","sendFMBMail.html"],["miqaatMail","sendMiqaatMail.html"],["fmbMail","sendFMBMail.html"]];
+                        ["thaaliCount","thaaliCount.html"],  ["miqaatCount","miqaatCount.html"], ["sendMail","sendFMBMail.html"],["miqaatMail","sendMiqaatMail.html"],["fmbMail","sendFMBMail.html"]];
 
 //Related to the Visible functionality.
 var visible_to_users=["Yes","No"];
@@ -123,7 +124,7 @@ var requestedButtonTemplate = "success";
 var notRequestedButtonTemplate = "warning";
 //An array that will hold the date when the user has opted for thaali.
 var userThaaliSignupArr = new Array();
-
+var thaaliRequestStateArr = null; //initialized within onLoadThaaliCalendar function
 
 /**
  * A generic method which will do a ajax call depending upon the input params.
@@ -2230,6 +2231,7 @@ createThaaliCountGetUrl = function(fromDateObj, toDateObj){
 }
 
 
+
 /**
  * Utility method to convert the date object from any format to the format MM/dd/yyyy
  */
@@ -2687,7 +2689,7 @@ onLoadThaaliCalendar = function(){
  	*  if possible - thaalis not requested should be orange and once requested should change to green.
         */
 	//this will hold the state of the user's thaali request. this is needed since on window resize the state of the thaali request is lost.
-	var thaaliRequestStateArr = new Array();
+	thaaliRequestStateArr = new Array();
 	//get the service url
     var currentDate = new Date();
     currentDate.setDate(1); //always starting from 1st day of the month...
@@ -2755,12 +2757,17 @@ onLoadThaaliCalendar = function(){
 				var buttonId = "jqxButton"+i;
 				var disabled = false;
 				var thaaliDate = eventDate;
-				
+				var miqaat = false;
 				var content = "";
 				if (thaaliData.thaaliInstructions.toLowerCase().indexOf("open") >= 0) {
 					//no thaali pakawnaar for this day, we need to highlight it..
 					content = "<small> Thaali Pakawanaar Needed </small>";
 					bg = yellowBg;
+				} else if (thaaliData.thaaliInstructions.toLowerCase().indexOf("miqaat") >= 0){
+					content = "<small> Enter how many people will be attending & click Yes</small>";
+					miqaat = true;
+					//bg = background;
+					bg = "#f9f9f9"; //grey background
 				} else {
 					content = "<small>" + thaaliData.thaaliInstructions + "</small>";
 					//bg = background;
@@ -2804,19 +2811,44 @@ onLoadThaaliCalendar = function(){
 					}
 				}
 
-				var buttonHtml = "<div id=\""+buttonId+"toolTip\"><input type=\"button\" class=\"thaaliSignupToggleButton\" value=\"" + userStatus + "\" id=\"" + buttonId + "\" isDisabled = "+disabled+" message=\""+displayMsg+"\" thaaliDate=\""+thaaliDate+"\" category=\""+thaaliData.userThaaliCategory+"\"/></div>";
+				
+				
+				
+				/** Introducing the functionality to add a number input - only for miqaats **/
+				if(miqaat == true){
+					var numberInputId = buttonId +"NumberInput";
+					var numberInputHtml = "<div id=\""+numberInputId+"\"><input type=\"text\" /><div></div></div>";
+					jqxButtonObj.numberInputId = numberInputId; //only for miqaat
+				}
+				
+				var buttonHtml = "<div id=\""+buttonId+"toolTip\"><input type=\"button\" class=\"thaaliSignupToggleButton\" value=\"" + userStatus + "\" id=\"" + buttonId + "\" isDisabled = "+disabled+" message=\""+displayMsg+"\" thaaliDate=\""+thaaliDate+"\" category=\""+thaaliData.userThaaliCategory+"\"  miqaat=\""+miqaat+"\"   /></div>";
+				
+				
 				if (isMobileView()) {
-					title = "<center><b><i>" + thaaliData.menu + "<br/><br/>" + buttonHtml + "<br/>" + content + "</i></b></center>";
+					if(miqaat == true){
+						title = "<center><b><i>" + thaaliData.menu + "<br/><br/>" + content + "<br/><br/>" + numberInputHtml + "<br/>" + buttonHtml + "</i></b></center>";
+						
+					}else{
+						title = "<center><b><i>" + thaaliData.menu + "<br/><br/>" + buttonHtml + "<br/>" + content + "</i></b></center>";
+					}
+
 				} else {
-					title = "<center><b><i><h4>" + thaaliData.menu  + "<br/><br/>" + buttonHtml  + "<br/>" + content + "</h4></i></b></center>";
+					if(miqaat == true){
+						title = "<center><b><i><h4>" + thaaliData.menu  + "<br/><br/>" + content  + "<br/><br/>" + numberInputHtml + "<br/>" + buttonHtml + "</h4></i></b></center>";
+					}else{
+						title = "<center><b><i><h4>" + thaaliData.menu  + "<br/><br/>" + buttonHtml  + "<br/>" + content + "</h4></i></b></center>";
+					}
 				}
 				//pushing the jqxButtonObj to the buttton array which would be used later..
 
 				jqxButtonObj.userStatus = userStatus;
 				jqxButtonObj.buttonTemplate = buttonTemplate;
 				jqxButtonObj.displayMsg = displayMsg;
-				jqxButtonObj.buttonId = buttonId;
+				jqxButtonObj.buttonId = buttonId;				
 				jqxButtonObj.disabled = disabled;
+				jqxButtonObj.miqaat = miqaat;
+				jqxButtonObj.numOfPpl = thaaliData.numOfFamilyMembers;
+				
 				
 				jqxButtonArr.push(jqxButtonObj);
 				
@@ -2862,14 +2894,18 @@ onLoadThaaliCalendar = function(){
             	 element.find('span.fc-event-title').html(element.find('span.fc-event-title').text());
             },
             
-            /* This method gets triggered after all events have rendered completely .
+            /* This method gets triggered after all events have rendered completely . */
             eventAfterAllRender: function(view){
-            	if ($(window).width() <= 768){
+            	/*if ($(window).width() <= 768){
             		//Means mobile view...we need to reduce the text size within the button.
             		$(".thaaliSignupToggleButton").css({"font-size": "30%"});
             		
-            	} 
-            },*/
+            	}*/
+            	//Adding an onclick event handler
+                  $(".thaaliSignupToggleButton").on('click', function(){
+                        toggleButtonOnClick(this);
+                  });
+            },
             
             /* This method gets invoked after the eventRender function above. */
             eventAfterRender: function( event, element, view ) { 
@@ -2881,6 +2917,19 @@ onLoadThaaliCalendar = function(){
             	  width = '70%';          		
           	  }
       		  $(buttonId).jqxToggleButton({ width: width, height: '50%', toggled: true, disabled: jqxButtonObj.disabled, roundedCorners: 'all', template: jqxButtonObj.buttonTemplate});
+      		  
+      		  /****** miqaat functionality starts ********/
+      		  if(jqxButtonObj.miqaat == true){
+      			var numberInputId = "#"+jqxButtonObj.numberInputId;
+      			if(isMobileView()){
+      				$(numberInputId).jqxFormattedInput({ width: '50%', height: '50%',radix: "decimal", spinButtons: false, value:jqxButtonObj.numOfPpl});
+      			}else{
+      				$(numberInputId).jqxFormattedInput({ width: '50%', height: '50%',radix: "decimal", spinButtons: true, spinButtonsStep: 1, value:jqxButtonObj.numOfPpl});
+      			}
+      		  }
+      		  
+      		  /*********** ends **********************************/
+      		  
       		  //We need to save the state of the user thaali request.. this is needed because on window resize, fullCalendar does not save the dom that we modifief on button click.
       		  var btnValue = thaaliRequestStateArr[buttonId];
 			
@@ -2894,6 +2943,8 @@ onLoadThaaliCalendar = function(){
     			}
       		  }
       		  
+      		 
+      		  
       		  var isDisabled = $(buttonId).attr('isDisabled');
       		  if(isDisabled === "true"){
       			//Depending upon the screen size we also need to display the message why it is disabled..
@@ -2905,88 +2956,11 @@ onLoadThaaliCalendar = function(){
       				theme : themeName
       			});
       		  }
-      		  
-      		  /* Method that will be called when the user clicks on the thaali signup button*/
-      		  $(buttonId).bind('click', function () {        		
-        		var isDisabled = $(this).attr('isDisabled');   		        		
-        		if(isDisabled === "false"){
-        			var thaaliDataObj = {};
-        			var thaaliDate =  $(this).attr('thaaliDate');
-        			
-        			var btnValue =  $(buttonId)[0].value;
-        			//we need to toggle the button values..
-        			if(btnValue === thaaliNotReq){
-        				$(buttonId)[0].value = thaaliRequested; //user friendly message
-        				$(buttonId).jqxToggleButton({template:requestedButtonTemplate}); //apply a suitable template based on the user request
-        				thaaliDataObj.userThaaliStatus = "REQUESTED_BY_USER"; //save the status to be upated server side.
-        				thaaliRequestStateArr[buttonId] = thaaliRequested; //save the thaali state for later use.
-        			}else{
-        				$(buttonId)[0].value = thaaliNotReq;	
-        				$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});
-        				thaaliDataObj.userThaaliStatus = "NOT_REQUESTED_BY_USER";
-        				thaaliRequestStateArr[buttonId] = thaaliNotReq;
-        			}
-        			thaaliDataObj.thaaliDate = new Date(thaaliDate);
-        			thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
-        			thaaliDataObj.thaaliCategory = $(this).attr('category');
-        			//Updating the array of thaali data objects.
-        			//userThaaliSignupArr.push(thaaliDataObj);
-        			//We will now save individual rows instead of a big-bang
-        			updateUserThaaliData(thaaliDataObj);
-        		}else{
-        			//Depending upon the screen size we also need to display the message why it is disabled..
-        			var msg = $(this).attr('message');
-        			var toolTipId = buttonId+"toolTip";
-        			$(toolTipId).jqxTooltip({
-        				position : 'top',
-        				content : msg,
-        				theme : themeName
-        			});
-        		}
-        	    });
             }
-           
+
         });
         
-        
-        
-       /* $(".thaaliSignupToggleButton").bind('click', function () {
-    		var buttonId = "#" + $(this).attr('id');
-    		var isDisabled = $(this).attr('isDisabled');
-    		
-    		
-    		if(isDisabled === "false"){
-    			var thaaliDataObj = {};
-    			var thaaliDate =  $(this).attr('thaaliDate');
-    			
-    			var btnValue =  $(buttonId)[0].value;
-    			//we need to toggle the button values..
-    			if(btnValue == "Not Requested"){
-    				$(buttonId)[0].value = "Requested";
-    				$(buttonId).jqxToggleButton({template:requestedButtonTemplate});
-    				thaaliDataObj.userThaaliStatus = "REQUESTED_BY_USER";			
-    			}else{
-    				$(buttonId)[0].value = "Not Requested";			
-    				$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});
-    				thaaliDataObj.userThaaliStatus = "NOT_REQUESTED_BY_USER";
-    			}
-    			thaaliDataObj.thaaliDate = new Date(thaaliDate);
-    			thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
-    			//Updating the array of thaali data objects.
-    			userThaaliSignupArr.push(thaaliDataObj);
-    		}else{
-    			//Depending upon the screen size we also need to display the message why it is disabled..
-    			var msg = $(this).attr('message');
-    			var toolTipId = buttonId+"toolTip";
-    			$(toolTipId).jqxTooltip({
-    				position : 'top',
-    				content : msg,
-    				theme : themeName
-    			});
-    		}
-    	    }); */
-
-
+   
     	$("#submitUserThaaliDataButton").on('click', function () {    	
     		if(userThaaliSignupArr.length > 0){
     			//Updating DB only when there is something to update.
@@ -3022,6 +2996,60 @@ onLoadThaaliCalendar = function(){
 		$('#thaaliCalendarErrorCallout').show();
 	}
 	
+	
+}
+
+/**
+ * Event handler triggered on click.
+ * @param obj
+ */
+toggleButtonOnClick = function(obj){
+	var isDisabled = $(obj).attr('isDisabled');
+	var miqaat = $(obj).attr('miqaat');
+	var buttonId = "#" + $(obj).attr('id');
+	var numberInputId = buttonId + "NumberInput"; //Used only for miqaats
+	if(isDisabled === "false"){
+		var thaaliDataObj = {};
+		var thaaliDate =  $(obj).attr('thaaliDate');
+		
+		var btnValue =  $(buttonId)[0].value;
+		//we need to toggle the button values..
+		if(btnValue === thaaliNotReq){
+			$(buttonId)[0].value = thaaliRequested; //user friendly message
+			$(buttonId).jqxToggleButton({template:requestedButtonTemplate}); //apply a suitable template based on the user request
+			thaaliDataObj.userThaaliStatus = "REQUESTED_BY_USER"; //save the status to be upated server side.
+			thaaliRequestStateArr[buttonId] = thaaliRequested; //save the thaali state for later use.
+			if(miqaat === "true"){
+				thaaliDataObj.numOfPplAttending = $(numberInputId).jqxFormattedInput('value');
+			}else{
+				thaaliDataObj.numOfPplAttending = 0;
+			}
+		}else{
+			$(buttonId)[0].value = thaaliNotReq;	
+			$(buttonId).jqxToggleButton({template:notRequestedButtonTemplate});
+			thaaliDataObj.userThaaliStatus = "NOT_REQUESTED_BY_USER";
+			thaaliRequestStateArr[buttonId] = thaaliNotReq;
+			thaaliDataObj.numOfPplAttending=0;
+		}
+		thaaliDataObj.thaaliDate = new Date(thaaliDate);
+		thaaliDataObj.userThaaliDate = getFormattedDate(new Date(thaaliDate)); //since the date coming back is a string.
+		thaaliDataObj.thaaliCategory = $(obj).attr('category');
+		
+		//Updating the array of thaali data objects.
+		//userThaaliSignupArr.push(thaaliDataObj);
+		//We will now save individual rows instead of a big-bang
+		
+		updateUserThaaliData(thaaliDataObj);
+	}else{
+		//Depending upon the screen size we also need to display the message why it is disabled..
+		var msg = $(obj).attr('message');
+		var toolTipId = buttonId+"toolTip";
+		$(toolTipId).jqxTooltip({
+			position : 'top',
+			content : msg,
+			theme : themeName
+		});
+	}
 }
 
 
@@ -3182,7 +3210,185 @@ sendEmail = function(emailTemplateName) {
 }
 
 
+/****************************** Miqaat Count functionality starts here *************************************************************************/
 
+onLoadMiqaatCount = function(){ 
+
+	var gridName = "#jqxMiqaatCountGrid";
+	var num_of_days_to_Advance = 30; //user thaali count 
+	 //Initializing a popup window, we would need this to display any success/error messages.
+	$("#miqaatCountMsgPopup").jqxWindow({ width: 500, height: 100 , autoOpen:false, theme:themeName});
+	
+   //Will have to check the isError attribute on the response object returned before proceeding any further.
+   
+   //get the service url
+   var currentDate = new Date();
+   var toDate =  new Date();
+   var yesterday = new Date();	
+   var initialRowsLoadedFromDatabase = -1; 
+   
+   yesterday.setDate(yesterday.getDate() - 1);
+   toDate.setDate(toDate.getDate() + num_of_days_to_Advance);
+   
+   //From date
+   $("#fromDate").datepicker({"format": "mm/dd/yyyy"});
+   $("#fromDate").attr("value",getFormattedDate(new Date()));
+	 
+   //To date
+   $("#toDate").datepicker({"format": "mm/dd/yyyy"});   
+   $("#toDate").attr("value",getFormattedDate(toDate));
+
+   $('#fromDate').datepicker()
+  	.on('changeDate', function(e){
+  		//hide the datepicker
+  		$("#fromDate").datepicker('hide');
+   });
+  
+   $('#toDate').datepicker()
+ 	.on('changeDate', function(e){
+ 		//hide the datepicker
+ 		$("#toDate").datepicker('hide');
+   });
+  
+   // prepare the data
+   var source =
+   {
+       //json/xml doesn't matter
+       datatype: "json",
+       datafields: [         
+           { name: 'thaaliDate', type: 'date', format: 'yyyy-MM-dd'},
+           { name: 'numOfPpl', type:'string'},           
+           { name: 'approxNumOfThaals', type:'string'},
+           { name: 'miqaatInstructions', type: 'string' }          
+       ],
+       url: createThaaliCountGetUrl(currentDate, toDate),  
+       sortcolumn: 'thaaliDate',
+       sortdirection: 'asc'
+   };
+   
+   getDataAdapter = function(source){
+   	var dataAdapter = new $.jqx.dataAdapter(source,{
+       	loadError: function(jqXHR, status, error){
+       		display(server_error_msg);
+       	},
+       	//This method will get invoked when the data is returned from the server.
+       	downloadComplete: function (edata, textStatus, jqXHR){
+       		if(edata.error == true){
+       			//An error has occurred.
+       			display(server_error_msg);
+       		}
+       	}   	
+       	
+       });
+   	return dataAdapter;
+   };
+   
+
+   //Need to align the column heading  in the center
+   var columnsrenderer = function (value) {
+   	return '<div style="text-align: center; margin-top: 5px;">' + value + '</div>';
+   }
+    
+   getMiqaatCountTblHdr = function(){	  
+	   return miqaatCountTblHdr;
+   }
+             
+   $(gridName).jqxGrid(
+   {	
+   	   source: getDataAdapter(source),
+   	   theme: themeName,
+   	   autorowheight:true,
+   	   altrows: true,
+   	   width: '100%',
+   	   autorowheight:true,
+       height: getHeight(),
+       pageable: true,
+       rowsheight: 40,
+       columnsresize:true, 
+       columnsheight: columnsHeight,
+       editable: true,
+       pagesize: getPageSize(),
+       columns: [
+           { text: getMiqaatCountTblHdr().MIQAAT_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '30%', cellsalign: 'center', editable: false, cellsformat: 'D'}, 
+           { text: getMiqaatCountTblHdr().MUMINEEN_COUNT, datafield: 'numOfPpl', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },
+           { text: getMiqaatCountTblHdr().APPROX_THAALS, datafield: 'approxNumOfThaals', renderer: columnsrenderer, cellsalign: 'center',   width: '15%', editable: false },       
+           { text: getMiqaatCountTblHdr().INSTRUCTIONS, datafield: 'miqaatInstructions', renderer: columnsrenderer, cellsalign: 'center',   width: '40%', editable: false }        
+           
+       ]
+   });
+   
+   
+   //Defining the fromDate field
+  // $("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+   
+   
+   //Defining the toDate field
+   //$("#toDate").jqxDateTimeInput({width: '250px', height: '25px', value: toDate, formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
+     
+   
+   
+   
+   //Defining a custom validator for the date field's
+   $('#miqaatCountForm').jqxValidator({
+	   hintType: 'label',
+   	onSuccess: function () {
+   		//var fromDate = $('#fromDate').jqxDateTimeInput('value');
+   		//currentDate = $('#fromDate').jqxDateTimeInput('value');
+        //toDate = $('#toDate').jqxDateTimeInput('value');
+        
+   		currentDate = new Date($('#fromDate').val());
+   		toDate = new Date($('#toDate').val());
+        
+       	//On success we need to refresh the thaali data.
+        source.url = createThaaliCountGetUrl(currentDate, toDate);
+        $(gridName).jqxGrid('updatebounddata');         
+   		
+   	},
+   	rules: [            
+       { 
+       	input: '#fromDate', message: 'Invalid Date. From Date cannot be greater than To Date.', action: 'valuechanged', rule:  function (input, commit){
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+           
+           var fromDate = new Date($('#fromDate').val());           
+           var toDate = new Date($('#toDate').val());
+           
+           if(fromDate != null && toDate != null){
+           	if(fromDate.getTime() > toDate.getTime()){
+           		return false;
+           	}
+           }else{
+           	return false;
+           }
+           return true;            	
+       } 
+       },                                   
+       
+       { input: '#toDate', message: 'Invalid Date. To Date cannot be smaller than From Date.', action: 'valuechanged', rule:  function (input, commit){
+           //var fromDate = $('#fromDate').jqxDateTimeInput('value');
+           //var toDate = $('#toDate').jqxDateTimeInput('value');
+    	   
+    	   var fromDate = new Date($('#fromDate').val());
+           var toDate = new Date($('#toDate').val());
+           
+           if(fromDate != null && toDate != null){
+           	if(fromDate.getTime() > toDate.getTime()){
+           		return false;
+           	}
+           }else{
+           	return false;
+           }
+           return true;            	
+       }  
+       }]                            
+   });
+   
+   //We would need to validate the form (one with fromDate and toDate, before refreshing data from the server)
+   $('#refreshMiqaatCountButton').on('click', function () {
+       $('#miqaatCountForm').jqxValidator('validate');                                
+   });
+   
+}
 /*
  * beforeLoadComplete: function (records,oData){ var pivotTable = new Array();
  * //We need to pivot the table based on the size of the window. if(oData !=
