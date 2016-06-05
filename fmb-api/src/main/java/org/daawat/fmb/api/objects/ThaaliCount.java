@@ -25,8 +25,8 @@ public class ThaaliCount implements Serializable{
 	
 	private int numOfPpl; //number of mumineen attending the miqaat
 	private int approxNumOfThaals;
-	private int numOfRiceCupsMiqaat;
-	private String miqaatInstructions;
+	private int numOfRiceCupsMiqaat; 
+	private String miqaatInstructions; //2 cups of rice (8 oz)/thaal - 1.5 Quart/thaal or 1 lb gosht/thaal
 	
 	public int getNumOfSmallThaalis() {
 		return numOfSmallThaalis;

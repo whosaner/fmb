@@ -53,8 +53,10 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 			thaaliCount.setJamanQty(calculateJamanQty(small,medium,large));
 			
 			thaaliCount.setNumOfPpl(resultSet.getInt("NUM_OF_PPL"));
-			thaaliCount.setApproxNumOfThaals(thaaliCount.getNumOfPpl()/8);
-			thaaliCount.setMiqaatInstructions("Niyaaz jaman should consist of 1 khaaraas and 1 meethaas and no israaf.");
+			
+			Double approxThaals = Math.ceil((double)thaaliCount.getNumOfPpl()/(double)8);
+			thaaliCount.setApproxNumOfThaals(approxThaals.intValue());
+			thaaliCount.setMiqaatInstructions("Few approximations that can help mumineen prepare jaman - 2 cups of rice (8 oz each) per thaal, 1.5 quart tarkaari per thaal OR 1 lb gosht per thaal");
 			thaaliCount.setInstructions("");			
 			thaaliCounts.add(thaaliCount);			
 		}
@@ -70,5 +72,6 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 		int jamanQty = (int) Math.ceil(LARGE_JAMAN * large + MEDIUM_JAMAN * medium + SMALL_JAMAN * small);
 		return jamanQty;
 	}
+	
 
 }

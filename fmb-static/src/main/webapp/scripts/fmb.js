@@ -1950,6 +1950,11 @@ validateUserProfileForm = function(){
 
 	$('#userProfileForm').validate({
 	    rules: {
+	    	familyMemberCount: {
+	            maxlength: 1,
+	            required: true,
+	            digits:true
+	        },
 	    	emailIp: {
                 multiemails: true
             }         
@@ -1962,7 +1967,11 @@ validateUserProfileForm = function(){
 	    messages: {
 	    	emailIp: {
 	    		multiemails: "Please enter a valid email address"
-	    	}	    	
+	    	},
+	    	familyMemberCount: {
+	    		digits: "Please enter a valid number between 1-9",
+	    		required: "Please enter a valid number between 1-9"	    		
+	    	}
 		}
 	});
 }
@@ -2009,8 +2018,11 @@ onLoadUserProfile = function(){
 			$('#tCategory').val(userProfileObj.thaaliCategory);
 			$('#tRice').val(userProfileObj.rice);
 			$('#tDelivery').val(userProfileObj.location);
+			$('#tFamilyCountLabel').val(userProfileObj.numOfFamilyMembers);
 			$('#userRole').val(userProfileObj.userRole);
 			$('#emailIp').val(userProfileObj.emailAddresses);
+			
+			
 		}else{
 			dataObj.error = true;
 			isError(dataObj);
@@ -2036,6 +2048,7 @@ onLoadUserProfile = function(){
 			var tDelivery = $('#tDelivery').val();
 			var userRole = $('#userRole').val();
 			var emailAddress = $('#emailIp').val();
+			var familyMemberCount = $('#tFamilyCountLabel').val();
 
 			// Need to call the ajax service to update the data.
 			var userProfileUpdatedObj = {
@@ -2050,8 +2063,9 @@ onLoadUserProfile = function(){
 				"thaaliCategory" : tCategory,
 				"rice":tRice,
 				"userRole" : userRole,
-				"emailAddresses":emailAddress
-			};
+				"emailAddresses":emailAddress,
+				"numOfFamilyMembers": familyMemberCount
+				};
 
 			var jsonStr = JSON.stringify(userProfileUpdatedObj);
 
@@ -2764,7 +2778,7 @@ onLoadThaaliCalendar = function(){
 					content = "<small> Thaali Pakawanaar Needed </small>";
 					bg = yellowBg;
 				} else if (thaaliData.thaaliInstructions.toLowerCase().indexOf("miqaat") >= 0){
-					content = "<small> Enter how many people will be attending & click Yes</small>";
+					content = "<small> Will you be attending Miqaat? If yes, please enter how many ?</small>";
 					miqaat = true;
 					//bg = background;
 					bg = "#f9f9f9"; //grey background
@@ -2817,7 +2831,7 @@ onLoadThaaliCalendar = function(){
 				/** Introducing the functionality to add a number input - only for miqaats **/
 				if(miqaat == true){
 					var numberInputId = buttonId +"NumberInput";
-					var numberInputHtml = "<div id=\""+numberInputId+"\"><input type=\"text\" /><div></div></div>";
+					var numberInputHtml = "<div id=\""+numberInputId+"\"><input type=\"text\" /><div></div></div> <br/><br/>";
 					jqxButtonObj.numberInputId = numberInputId; //only for miqaat
 				}
 				
@@ -2999,6 +3013,7 @@ onLoadThaaliCalendar = function(){
 	
 }
 
+
 /**
  * Event handler triggered on click.
  * @param obj
@@ -3021,6 +3036,7 @@ toggleButtonOnClick = function(obj){
 			thaaliRequestStateArr[buttonId] = thaaliRequested; //save the thaali state for later use.
 			if(miqaat === "true"){
 				thaaliDataObj.numOfPplAttending = $(numberInputId).jqxFormattedInput('value');
+				
 			}else{
 				thaaliDataObj.numOfPplAttending = 0;
 			}
