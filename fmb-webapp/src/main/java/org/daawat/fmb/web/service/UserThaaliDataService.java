@@ -15,12 +15,16 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.daawat.fmb.api.db.MiqaatDetailsDAO;
+import org.daawat.fmb.api.db.MiqaatRegistrationDAO;
 import org.daawat.fmb.api.db.ThaaliDataDAO;
 import org.daawat.fmb.api.db.ThaaliFeedbackDAO;
 import org.daawat.fmb.api.db.UserThaaliDataDAO;
 import org.daawat.fmb.api.enums.ThaaliStatus;
 import org.daawat.fmb.api.enums.UserRole;
 import org.daawat.fmb.api.enums.UserThaaliStatus;
+import org.daawat.fmb.api.objects.MiqaatDetails;
+import org.daawat.fmb.api.objects.MiqaatRegistration;
 import org.daawat.fmb.api.objects.Request;
 import org.daawat.fmb.api.objects.Response;
 import org.daawat.fmb.api.objects.ThaaliData;
@@ -30,6 +34,8 @@ import org.daawat.fmb.api.objects.UserThaaliData;
 import org.daawat.fmb.api.objects.UserThaaliDayWiseData;
 import org.daawat.fmb.api.objects.UserThaaliReport;
 import org.daawat.fmb.api.objects.UserThaaliView;
+import org.daawat.fmb.impl.daos.MiqaatDetailsDAOImpl;
+import org.daawat.fmb.impl.daos.MiqaatRegistrationDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliDataDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliFeedbackDAOImpl;
 import org.daawat.fmb.impl.daos.UserThaaliDataDAOImpl;
@@ -44,7 +50,9 @@ public class UserThaaliDataService extends BaseService{
 
 	private static final String COMP_NAME = "UserThaaliDataService";
 	private static final String DATE_PATTERN = "MM/dd/yyyy";
-	
+	private static final int FROM_HOUR = 17;
+	private static final int TO_HOUR = 21;
+	private static final String MIQAAT_DATE_PATTERN = "yyyy-MM-dd";
 	
 	
 	
@@ -121,7 +129,8 @@ public class UserThaaliDataService extends BaseService{
 							userThaaliData.setUserThaaliStatus(UserThaaliStatus.NOT_REQUESTED_BY_USER);
 						}else{
 							//Check if the user can make any modification for the current thaali date at this point in time.
-							isLocked = isThresholdReached(thaaliDate);
+							//if its a MIQAAT, the threshold will be different							
+							isLocked = isThresholdReached(thaaliDate,getThaaliFreezeThresholdProperty(thaaliData));
 						}
 						
 						
@@ -167,13 +176,13 @@ public class UserThaaliDataService extends BaseService{
 	 * 
 	 * @param thaaliDate
 	 */
-	private boolean isThresholdReached(Date thaaliDate) throws Exception{
+	private boolean isThresholdReached(Date thaaliDate, String key) throws Exception{
 		//Get current date.
 		//if thaaliDate - currentDate > 2
 		  //return true
 		//else return false
 		int diff = DateUtils.getDiffWithCurrentDate(thaaliDate);
-		int threshold  = PropertyFileManager.getIntValue("thaali_freeze_threshold_days") ;
+		int threshold  = PropertyFileManager.getIntValue(key) ;
 		if(diff < threshold){
 			//Means no further modifications allowed
 			return true;
@@ -182,6 +191,19 @@ public class UserThaaliDataService extends BaseService{
 			return false;
 		}
 		
+	}
+	
+	/**
+	 * Method to determine the thaali freeze threshold property name 
+	 * @param thaaliData
+	 * @return
+	 */
+	private String getThaaliFreezeThresholdProperty(ThaaliData thaaliData){
+		String propertyName = "thaali_freeze_threshold_days";
+		if(thaaliData.getInstructions() != null && thaaliData.getInstructions().toUpperCase().contains("MIQAAT")){
+			propertyName = "thaali_freeze_threshold_days_miqaat";
+		}
+		return propertyName;
 	}
 	
 	@POST
@@ -221,6 +243,9 @@ public class UserThaaliDataService extends BaseService{
 					isError = false;
 					isMatched = false;
 					
+					int numOfppl = 0;
+					String instructions = "";
+					
 					for(int j=0;j<thaaliDataList.size();j++){
 						ThaaliData thaaliData = thaaliDataList.get(j);
 						Date thaaliDate = thaaliData.getThaaliDate();
@@ -228,7 +253,7 @@ public class UserThaaliDataService extends BaseService{
 							if(ThaaliStatus.THAALI_PRESENT.equals(thaaliData.getStatus()) && thaaliData.isVisible()){
 								//Means we have thaali present for the day user has asked
 								//Now we need to see if the user can update the thaali request for that day or not.
-								if(!isThresholdReached(thaaliDate) || UserThaaliStatus.NOT_REQUESTED_BY_USER.equals(userThaaliData.getUserThaaliStatus())){
+								if(!isThresholdReached(thaaliDate,getThaaliFreezeThresholdProperty(thaaliData)) || UserThaaliStatus.NOT_REQUESTED_BY_USER.equals(userThaaliData.getUserThaaliStatus())){
 									List<UserThaaliData> userThaaliDataList = userThaaliDAO.getThaaliDataPerUser(familyGroupId,thaaliDate, null, null);
 									int returnVal = 0;
 									if(!Utils.isNullOrEmpty(userThaaliDataList)){
@@ -236,16 +261,37 @@ public class UserThaaliDataService extends BaseService{
 										UserThaaliData userThaaliDataDB = userThaaliDataList.get(0); //getting the first and the only object..
 										/* the below fields (thaali category and rice) are not visible on the thaali signup sheet..so whenever an update is made to that day thaali, 
 										 * we pick this value latest from the USER_PROFILE_TABLE*/
-										userThaaliDataDB.setThaaliCategory(userProfileData.getThaaliCategory());
-										userThaaliDataDB.setRice(userProfileData.getRice());
+										numOfppl = userProfileData.getNumOfFamilyMembers();
+										instructions = userThaaliData.getUserInstructions();
 										
+										if(isMiqaat(thaaliData)){
+											numOfppl = userThaaliData.getNumOfPplAttending();
+											instructions = thaaliData.getInstructions();
+											if(numOfppl == 0){
+												numOfppl = userProfileData.getNumOfFamilyMembers();
+											}
+										}
+										
+										userThaaliDataDB.setThaaliCategory(userProfileData.getThaaliCategory());
+										userThaaliDataDB.setRice(userProfileData.getRice());										
 										userThaaliDataDB.setUserThaaliStatus(userThaaliData.getUserThaaliStatus());
-										userThaaliDataDB.setUserInstructions(userThaaliData.getUserInstructions());
-										userThaaliDataDB.setNumOfPplAttending(userThaaliData.getNumOfPplAttending());
+										userThaaliDataDB.setUserInstructions(instructions);
+										userThaaliDataDB.setNumOfPplAttending(numOfppl);
 										returnVal = userThaaliDAO.updateUserThaaliData(userThaaliDataDB);							
 									}else{
 										//Row does not exist
-										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, userThaaliData.getUserInstructions(), userProfileData.getLocation(), userProfileData.getNumOfFamilyMembers());
+										numOfppl = userProfileData.getNumOfFamilyMembers();
+										instructions = userThaaliData.getUserInstructions();
+										//Check if this is MiQAAT or Thaali
+										if(isMiqaat(thaaliData)){
+											numOfppl = userThaaliData.getNumOfPplAttending();
+											instructions = thaaliData.getInstructions();
+											if(numOfppl == 0){
+												numOfppl = userProfileData.getNumOfFamilyMembers();
+											}
+										}
+																				
+										UserThaaliData userThaaliDataDB = new UserThaaliData(userThaaliData.getThaaliDate(), userProfileData.getFirstName(), userProfileData.getFamilyName(), userProfileData.getThaaliCategory(), userProfileData.getRice(), UserThaaliStatus.REQUESTED_BY_USER, familyGroupId, instructions , userProfileData.getLocation(), numOfppl);
 										returnVal = userThaaliDAO.addUserThaaliData(userThaaliDataDB);					
 									}
 									
@@ -498,6 +544,100 @@ public class UserThaaliDataService extends BaseService{
 			isError = true;
 		}
 		return new Response<ThaaliFeedback>(msg, isError);
+	}
+	
+	@POST
+	@Path("/miqaatRegistration")
+	@Consumes(MediaType.APPLICATION_JSON)	
+	@Produces({MediaType.APPLICATION_XML,MediaType.APPLICATION_JSON})
+	public Response<MiqaatRegistration> submitMiqaatRegistration(Request<MiqaatRegistration> requestObj){
+		String msg = "";
+		boolean isError = false;
+		int returnVal = -1;
+		
+		try{
+			authenticateUser(requestObj.geteJamaatId(), requestObj.getPassword());
+			MiqaatRegistrationDAO registerDAO =  new MiqaatRegistrationDAOImpl();
+			MiqaatRegistration registration = requestObj.getDataList().get(0); //Since for a given request only one feedback can be submitted.
+			registration.setTimestamp(DateUtils.getTimestamp());
+			Logger.info(COMP_NAME, "Registration = " +registration);
+			returnVal = registerDAO.addMiqaatRegistration(registration);
+			isError = isOperationSuccessful(returnVal, msg, "Registration Successful");
+		}catch(Exception e){
+			msg = "An exception has occurred inside submitMiqaatRegistration.";
+			Logger.error(COMP_NAME, msg, e);
+			isError = true;
+		}
+		return new Response<MiqaatRegistration>(msg, isError);
+	}
+	
+	@GET
+	@Path("/getMiqaatDetails")
+	@Produces({MediaType.APPLICATION_XML,MediaType.APPLICATION_JSON})	
+	public  Response<MiqaatDetails> getMiqaatDetails(@QueryParam("ejamaatId") String eJamaatId, @QueryParam("password") String password, @QueryParam("limit") int rowLimit){
+		String msg = "";
+		boolean isError = false;
+		MiqaatDetails miqaatDetail = null;
+		try{
+			MiqaatDetailsDAO miqaatDetailsDAO = new MiqaatDetailsDAOImpl();
+			authenticateUser(eJamaatId, password);
+			List<MiqaatDetails> miqaatDetails = miqaatDetailsDAO.getMiqaatDetailsNRows(rowLimit);
+			if(miqaatDetails != null && !miqaatDetails.isEmpty()){
+				int n = miqaatDetails.size();
+				for(int i = n-1; i>=0; i--){
+					MiqaatDetails detail = miqaatDetails.get(i);
+					Date miqaatDateDB = detail.getMiqaatDate();
+					Logger.info(COMP_NAME, "Miqaat Date Before = "+miqaatDateDB.toString());
+					//converting from SQL date to Util date explicitly
+					java.util.Date miqaatDt = DateUtils.getDate(miqaatDateDB.toString(), MIQAAT_DATE_PATTERN);
+					int val = DateUtils.compareWithCurrentDate(miqaatDt);
+					Logger.info(COMP_NAME, "Miqaat Date After = "+miqaatDt+ ", Comparison with curr date = "+val);
+					/*
+					 * If same day then we check if registration is locked
+					 */
+					if(val == 0){
+						//isLocked
+						String timeInfo = DateUtils.getTimeInfo(FROM_HOUR, TO_HOUR);
+						Logger.info(COMP_NAME, "Time Info for date = "+miqaatDt+" = "+timeInfo);
+						if(timeInfo.equals("BETWEEN")){
+							//locked - we need to display an error
+							msg = "Registration is locked for the day, registration will open today at "+TO_HOUR+":00 hrs";
+							break;
+						}else if(timeInfo.equals("BEFORE")){
+							miqaatDetail = detail;
+							break;
+						}else{
+							//we want to return previous day since we are going reverse
+							if(i-1 >= 0){
+								miqaatDetail = miqaatDetails.get(i-1);
+								break;
+							}
+						}
+					}else if(val < 0){
+						continue;
+					}else{
+						//we cannot register for a future miqaat
+						break;
+					}
+				}								
+			}
+			
+			if(miqaatDetail == null){
+				isError =  true;
+				msg = msg.length() > 0?msg: "Currently there are no miqaats to register";				
+			}			 			
+		}catch(Exception ex){
+			ex.printStackTrace();
+		msg = "An exception has occurred inside getMiqaatDetails for ejamaat id";
+		Logger.error(COMP_NAME, msg, ex);
+		isError = true;
+	}
+	return new Response<MiqaatDetails>(miqaatDetail, msg, isError);
+	}
+	
+	
+	private boolean isMiqaat(ThaaliData thaaliData){
+		return thaaliData.getInstructions().toUpperCase().contains("MIQAAT");
 	}
 	
 	

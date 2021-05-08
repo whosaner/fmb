@@ -13,9 +13,11 @@ public class ThaaliCount implements Serializable{
 	 */
 	private static final long serialVersionUID = 1L;
 
+	private int numOfXSmallThaalis;
 	private int numOfSmallThaalis;
 	private int numOfMediumThaalis;
 	private int numOfLargeThaalis;
+	private int numOfXLargeThaalis;
 	private int totalNumOfThaalis;
 	private Date thaaliDate;
 	private int jamanQty; //in quarts
@@ -100,6 +102,20 @@ public class ThaaliCount implements Serializable{
 	public void setMiqaatInstructions(String miqaatInstructions) {
 		this.miqaatInstructions = miqaatInstructions;
 	}
+	
+	public int getNumOfXSmallThaalis() {
+		return numOfXSmallThaalis;
+	}
+	public void setNumOfXSmallThaalis(int numOfXSmallThaalis) {
+		this.numOfXSmallThaalis = numOfXSmallThaalis;
+	}
+	public int getNumOfXLargeThaalis() {
+		return numOfXLargeThaalis;
+	}
+	public void setNumOfXLargeThaalis(int numOfXLargeThaalis) {
+		this.numOfXLargeThaalis = numOfXLargeThaalis;
+	}
+	
 	
 	
 	

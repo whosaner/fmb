@@ -62,17 +62,19 @@
 								<!-- /.table -->
 								<div id="thaaliViewMsgPopup" style="display: none;">
 									<div>Message</div>
-									<div id="msgContent"></div> 
+									<div id="msgContent"></div>
 								</div>
 							</div>
 							<div class="box-footer clearfix" style="display: block;">
-								<button class="pull-right btn btn-primary" id="excelExport">Export</button>
-							</div>						
+								<button class="pull-right btn btn-primary" id="htmlExport" onclick="exportDataToHTML()">Export</button>
+							</div>
+							<div class="box-footer clearfix" id="exportThaaliDataTable" style="display: none;"></div>					
 						</div>
 						<!-- /.box -->
 					</section>
 					<!-- right col -->
 				</div>
+				
 				<!-- /.row (main row) -->
 				<script type="text/javascript">
 					// Create a jqxMenu

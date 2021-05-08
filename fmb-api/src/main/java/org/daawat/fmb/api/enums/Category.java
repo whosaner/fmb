@@ -2,7 +2,11 @@ package org.daawat.fmb.api.enums;
 
 public enum Category {
 
-	Small("Small"), Medium("Medium"),Large("Large");
+	Small("Small"), 
+	Medium("Medium"),
+	Large("Large"),
+	XSmall("X-Small"),
+	XLarge("X-Large");
 	
 	private  String category ;
 	private Category(String category){

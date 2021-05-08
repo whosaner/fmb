@@ -207,7 +207,7 @@ public class UserProfileData implements Serializable{
 		objList.add(numOfFamilyMembers);
 		objList.add(userCredentials.geteJamaatId());
 		objList.add(userCredentials.getPassword());
-		
+		//objList.add(emailType != null ? emailType.getValue(): EmailType.NONE.getValue()); //add this to update sql query also
 		return objList;
 		
 	}
@@ -220,7 +220,7 @@ public class UserProfileData implements Serializable{
 				+ userRole + ", thaaliCategory=" + thaaliCategory
 				+ ", location=" + location + ", rice=" + rice
 				+ ", familyGroupId=" + familyGroupId + ", emailAddresses="
-				+ emailAddresses + ", emailType=" + emailType + "numOfFamilyMembers = "+numOfFamilyMembers+"]";
+				+ emailAddresses + ", emailType=" + emailType + ", numOfFamilyMembers = "+numOfFamilyMembers+"]";
 	}
 
 	

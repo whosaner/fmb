@@ -8,4 +8,5 @@ import org.daawat.fmb.api.objects.ThaaliCount;
 public interface ThaaliCountDAO {
 
 	public List<ThaaliCount> getThaaliCounts(Date fromDate, Date toDate) throws Exception;
+	public List<ThaaliCount> getMiqaatCount(Date fromDate, Date toDate) throws Exception;
 }

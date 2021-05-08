@@ -19,6 +19,7 @@ var admin_thaali_update_service_url = server_url+"/admin/updateThaaliData";
 var add_menu_service_url=server_url+"/admin/addMenu";
 var add_region_service_url=server_url+"/admin/addRegion";
 var user_feedback_service_url=server_url+"/admin/getFeedback";
+var user_miqaat_registration_service_url=server_url+"/admin/getMiqaatRegistrations";
 var all_user_profile_service_url=server_url+"/admin/getAllUserProfileData";
 var profile_create_service_url = server_url+"/admin/createProfile";
 var sendEmail_url=server_url+"/sendEmail";
@@ -30,6 +31,8 @@ var all_user_thaali_get_service_url=server_url+"/user/getAllUserThaaliData";
 var profile_get_service_url=server_url+"/profile/getProfile";
 var profile_update_service_url=server_url+"/profile/updateProfile";
 var submit_feedback_service_url = server_url+"/user/submitFeedback";
+var miqaat_registration_service_url = server_url+"/user/miqaatRegistration";
+var miqaat_details_service_url = server_url+"/user/getMiqaatDetails";
 
 
 //misc services
@@ -37,8 +40,11 @@ var get_menu_service_url=server_url+"/misc/getMenu";
 var get_cookname_url=server_url+"/misc/getCook";
 var get_region_service_url=server_url+"/misc/getRegion";
 var thaali_count_service_url=server_url+"/misc/getThaaliCount";
+var miqaat_count_service_url=server_url+"/misc/getMiqaatCount";
+
 
 var msg_on_thaali_frozen = "No more Thaali Request's can be made for the particular day. Please contact "+contactPerson;
+var msg_on_miqaat_frozen = "Aap sagla ne niyaz nu izan che, but please inform M. Adnan bhai Khambaty"
 var on_delete_error_msg = 'You can only edit but not remove any existing thaali day present in the system.'
 var server_error_msg = 'An error has occurred while getting the data from the server. Please try again';
 
@@ -54,7 +60,7 @@ var thaaliStatusMap = [{displayName:"Yes", serverName:"REQUESTED_BY_USER", statu
                        {displayName:"Yes", serverName:"THAALI_PRESENT", status:"thaali_status"},
                        {displayName:"No", serverName:"THAALI_NOT_PRESENT", status:"thaali_status"}];
 
-var user_thaali_category = ["Small","Medium","Large"];
+var user_thaali_category = ["XSmall","Small","Medium","Large","XLarge"];
 var num_of_days_to_Advance = 60; //Upper bound on the num of days thaali data that would be visible, if toDate is not specified
 
 var thaaliTblHeaders = {THAALI_MADE_BY:"Thaali <br/> Pakawnaar",MENU:"Menu", INSTRUCTIONS: "Instructions <br/> (If any)", THAALI_STATUS: "Status", THAALI_DATE: "Date", VISIBLE: "Visible <br/> to <br/> Jamaat"};
@@ -82,10 +88,18 @@ var userFeedbackTblHeadersMobile=[{Name:"Creation <br/> Date", Width:"15%"},
 		 						  {Name:"First <br/> Name", Width:"10%"}, 
 		 						  {Name:"Name", Width:"20%"}];
 
+var userMiqaatRegistrationTblHeaders=[{Name:"Miqaat <br/> Date", Width:"15%"},
+                                      {Name:"Timestamp", Width:"8%"},
+                                      {Name:"Miqaat <br/> Name", Width:"17%"},
+                                    {Name:"First <br/> Name", Width:"10%"}, 
+           		 					{Name:"Family <br/> Name", Width:"10%"},
+           		 					{Name:"Family <br/> Members", Width:"15%"},
+                            		{Name:"Covid Status", Width:"25%"}];
 
-var thaaliCountTblHdr = {THAALI_DATE:"Date",TOTAL_THAALI:"Total", SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", JAMAN_QTY: "Jaman Qty <br/> quarts", RICE_CUPS: "Rice cups <br/> (8oz)"};
-var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"Tot", SMALL_THAALI:"Sm", MEDIUM_THAALI:"Med", LARGE_THAALI:"Lg", JAMAN_QTY: "Qty <br/> qts", RICE_CUPS: "Rice cups <br/> (8oz)"};
 
+var thaaliCountTblHdr = {THAALI_DATE:"Date",TOTAL_THAALI:"Total", XSMALL_THAALI: "X-Small", SMALL_THAALI:"Small", MEDIUM_THAALI:"Medium", LARGE_THAALI:"Large", XLARGE_THAALI: "X-Large"};
+var thaaliCountTblHdrMobile = {THAALI_DATE:"Date",TOTAL_THAALI:"Tot", XSMALL_THAALI: "XS", SMALL_THAALI:"S", MEDIUM_THAALI:"M", LARGE_THAALI:"L", XLARGE_THAALI:"XL"};
+var thaaliCategoryShorthand = {Small: "S", Medium: "M", Large: "L", XSmall : "XS", XLarge: "XL", VERIFY: "VERIFY"};
 var miqaatCountTblHdr = {MIQAAT_DATE:"Miqaat Date", MUMINEEN_COUNT:"Mumineen count",APPROX_THAALS:"Approx Thaals", INSTRUCTIONS:"Instructions/ <br/> Guidelines"};
 	
 var maxRowsAllowedToBeAdded = 60;
@@ -100,8 +114,9 @@ var errorMsg = "An error has occurred while updating the Thaali Data. Please try
 var dat_diff_msg = "The difference between from date and to date cannot be more than 7 days.";
 
 //Items that are present on the dashboard.
-var userDashboardArr = [["thaaliSignup","thaaliSignup.html"],["userProfile","userProfile.html"],["rotiKhidmat","rotiKhidmat.html"],["submitFeedback","submitFeedback.html"],["notification","notification.html"],["thaaliSchedule","thaaliSchedule.html"],
-                        ["listThaaliSignups","listThaaliSignups.html"],["registerNewUser","registerNewUser.html"],["addMenu","addMenu.html"],["thaaliInformation","thaaliSchedule.html"],["viewFeedback","viewFeedback.html"],["thaaliCalendar","thaaliCalendar.html"],
+var userDashboardArr = [["thaaliSignup","thaaliSignup.html"],["miqaatRegistration","miqaatRegistration.html"], ["userProfile","userProfile.html"],["rotiKhidmat","rotiKhidmat.html"],["submitFeedback","submitFeedback.html"],["notification","notification.html"],["thaaliSchedule","thaaliSchedule.html"],
+                        ["listThaaliSignups","listThaaliSignups.html"],["registerNewUser","registerNewUser.html"],["addMenu","addMenu.html"],["thaaliInformation","thaaliSchedule.html"],["viewFeedback","viewFeedback.html"],
+                        ["viewRegistration","viewRegistration.html"], ["thaaliCalendar","thaaliCalendar.html"],
                         ["thaaliCount","thaaliCount.html"],  ["miqaatCount","miqaatCount.html"], ["sendMail","sendFMBMail.html"],["miqaatMail","sendMiqaatMail.html"],["fmbMail","sendFMBMail.html"]];
 
 //Related to the Visible functionality.
@@ -147,11 +162,13 @@ function handleAjax(methodType,reqUrl,reqData){
 	           // callback code here
 	        	 dataObj.jsonData =  data;
 	        	 dataObj.error = data.error;
+	        	 dataObj.message = data.message;
 	          },
 	    
 	    	error: function (error) {
 	    		dataObj.jsonData =  error;
 	    		dataObj.error = true;
+	    		dataObj.message = data.message;
 	    	}
 	          
 	       });
@@ -423,7 +440,7 @@ onLoadThaaliSchedule = function () {
                         },
                         width: (function(){
                         	if(isMobileView()){
-                        		return '50%';
+                        		return '30%';
                         	}
                         	return '20%';
                         })()
@@ -440,9 +457,16 @@ onLoadThaaliSchedule = function () {
                             // return the old value, if the new value is empty.
                             if (newvalue == "") return oldvalue;
                         },
+                        //Added the below as we need to see who made thaali when viewing on phone
+                        width: (function(){
+                                if(isMobileView()){
+                                        return '20%';
+                                }
+                                return '20%';
+                        })()
                         
                         //hide the column for mobile views.
-                        hidden: isMobileView()
+                        //hidden: isMobileView()
                         
                         
                     },                    
@@ -474,12 +498,19 @@ onLoadThaaliSchedule = function () {
                         },
                         width: (function(){
                         	if(isMobileView()){
-                        		return '20%';
+                        		return '10%';
                         	}
                         	return '10%';
                         })()
                     },
-                    { text:  thaaliTblHeaders.INSTRUCTIONS, datafield: 'instructions', renderer: columnsrenderer, cellsalign: 'center',  width: '20%',hidden: isMobileView() }
+                    { text:  thaaliTblHeaders.INSTRUCTIONS, datafield: 'instructions', renderer: columnsrenderer, cellsalign: 'center', 
+		       	width: (function(){
+                                    if(isMobileView()){
+                                             return '10%';
+                                     }
+                                     return '20%';
+                        })()
+                    }
                 ]
             });
             
@@ -1295,10 +1326,12 @@ onLoadThaaliCount = function(){
        datatype: "json",
        datafields: [         
            { name: 'thaaliDate', type: 'date', format: 'yyyy-MM-dd'},
-           { name: 'totalNumOfThaalis', type:'string'},           
+           { name: 'totalNumOfThaalis', type:'string'},
+           { name: 'numOfXSmallThaalis', type:'string'},
            { name: 'numOfSmallThaalis', type:'string'},
            { name: 'numOfMediumThaalis', type: 'string' },
            { name: 'numOfLargeThaalis', type: 'string' },
+           { name: 'numOfXLargeThaalis', type: 'string' },
            { name: 'jamanQty', type: 'string' },
            { name: 'numOfRiceCups', type: 'string' }            
        ],
@@ -1355,11 +1388,13 @@ onLoadThaaliCount = function(){
        columns: [
            { text: getThaaliCountTblHdr().THAALI_DATE, datafield: 'thaaliDate', renderer: columnsrenderer, width: '23%', cellsalign: 'center', editable: false, cellsformat: 'D'}, 
            { text: getThaaliCountTblHdr().TOTAL_THAALI, datafield: 'totalNumOfThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '12%', editable: false },
+           { text: getThaaliCountTblHdr().XSMALL_THAALI, datafield: 'numOfXSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
            { text: getThaaliCountTblHdr().SMALL_THAALI, datafield: 'numOfSmallThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
            { text: getThaaliCountTblHdr().MEDIUM_THAALI, datafield: 'numOfMediumThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
            { text: getThaaliCountTblHdr().LARGE_THAALI, datafield: 'numOfLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
-           { text: getThaaliCountTblHdr().JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
-           { text: getThaaliCountTblHdr().RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false }         
+           { text: getThaaliCountTblHdr().XLARGE_THAALI, datafield: 'numOfXLargeThaalis', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false }
+           /*{ text: getThaaliCountTblHdr().JAMAN_QTY, datafield: 'jamanQty', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false },
+           { text: getThaaliCountTblHdr().RICE_CUPS, datafield: 'numOfRiceCups', renderer: columnsrenderer, cellsalign: 'center',   width: '13%', editable: false }*/         
            
        ]
    });
@@ -1554,6 +1589,9 @@ onLoadViewThaaliAll = function(){
               			}           			           			
           			}       			
           		}
+          		
+          		//We will now save this data to a hidden div so we can save this to PDF on the export button click
+          		saveThaaliData(oData);
 
       		}
       		return records;
@@ -1601,10 +1639,7 @@ onLoadViewThaaliAll = function(){
    
   
   
-  //Exporing the grid as excel for better viewing.
-   $("#excelExport").click(function () {
-       $("#jqxAllUserThaaliDataGrid").jqxGrid('exportdata', 'html', 'thaaliSignup');
-    });
+ 
       
    //Defining the fromDate field
    //$("#fromDate").jqxDateTimeInput({width: '250px', height: '25px', formatString: "dddd, MMMM dd, yyyy", enableBrowserBoundsDetection: true, theme:themeName});
@@ -1725,11 +1760,217 @@ onLoadViewThaaliAll = function(){
    $('#refreshUserDataButton').on('click', function () {
        $('#userDateFieldForm').jqxValidator('validate');                                
    });
-
-
-	
+   
+   
+  
 
 }
+
+
+/******************************************** Functionality to export ALL USERS THAALI DATA TO PDF for printing purposes *****************************************************/
+saveThaaliData = function(oData){
+	$('#exportThaaliDataTable').data('thaaliData',oData);
+}
+
+
+exportDataToHTML = function(oData){	
+	var records = $('#exportThaaliDataTable').data('thaaliData').dataList;
+	 
+	if(records != null && records.length > 0){
+		records.sort(function (record1, record2){
+			//Sort based on location
+			var locA = record1.location.toLowerCase();
+			var locB = record2.location.toLowerCase();
+			var value = 0;
+			if(locA < locB) return -1;
+			if(locA > locB) return 1;
+			return 0;
+		});
+		
+		var labels = new Array();
+		var differentThaaliCategories = "VERIFY";
+		var menuMaxLength = 40;
+		var thaaliCounts = new Object(); //using this as a dictionary
+		var thaaliLocation = new Object(); //using this as a dictionary
+		for (var i = 0; i < records.length; i++) {
+  			var record = records[i];
+  			var label = new Object();
+  			if(record.familyGroupId){  				
+  				label.location = record.location;
+  				label.name = record.familyName;
+  				label.thaaliCategory = null;
+  				label.rice = "";
+  				
+				//Recording thaali per location for reporting purposes
+				if(thaaliLocation[label.location] == null || thaaliLocation[label.location] === undefined){
+					thaaliLocation[label.location] = 1;
+				}else{
+					thaaliLocation[label.location] = thaaliLocation[label.location] + 1;
+				}
+  				
+  				label.dates = new Array();
+  				//Just making sure that the record is valid and it is not some junk.
+  			    var thaaliDataArr = record.userThaaliDayWiseData;
+  			    //We need to get the column names which would be the thaali dates.       			              			
+      			if(thaaliDataArr != null && thaaliDataArr.length > 0){    				
+          			for(var j=0;j<thaaliDataArr.length;j++){
+          				var count = 0;
+          				label.dates[j] = new Object();
+          				var thaaliDataDayWise = thaaliDataArr[j];
+          				//TODO: We may want to remove year from thaali date to save real estate on screen
+          				label.dates[j].date = thaaliDataDayWise.thaaliDate;
+          				var thaaliMenu =  thaaliDataDayWise.menu.substring(0, menuMaxLength);
+          				label.dates[j].menu = thaaliMenu;
+          				/*
+          				 * To determine thaali category and rice selection
+          				 * Also making sure thaali categories are not different for different days 
+          				 */
+          				
+          				//Getting sign up data
+          				if(thaaliDataDayWise.thaaliCategory != null){
+          					//Signed up for thaali          					
+          					label.dates[j].signedUp = "Yes"; 
+          					count = 1; //adding one to thaali count
+          					if(label.thaaliCategory == null){
+          						label.thaaliCategory = thaaliDataDayWise.thaaliCategory;
+          					}else{
+          						if(label.thaaliCategory != thaaliDataDayWise.thaaliCategory){
+              						//thaali category is different for different days
+              						label.thaaliCategory = differentThaaliCategories;
+              					}else{
+              						if(thaaliDataDayWise.userThaaliStatus == "REQUESTED_BY_USER" && thaaliDataDayWise.rice == "No"){
+              							label.rice = "No";                  					     				
+                      				}
+              					}
+          					}
+          					
+          					//Updating thaali count's which will be helpful for reporting purposes
+          					var data = new Object(); 
+          					var thaaliCategoryShortName = thaaliCategoryShorthand[label.thaaliCategory];
+              				if(thaaliCounts[thaaliMenu] == null || thaaliCounts[thaaliMenu] === undefined){      						
+          						data[thaaliCategoryShortName] = count;          						
+          					}else{
+          						data = thaaliCounts[thaaliMenu];
+          						if(data[thaaliCategoryShortName] == null || data[thaaliCategoryShortName] === undefined){
+          							data[thaaliCategoryShortName] = 0;
+          						}
+          						data[thaaliCategoryShortName] = data[thaaliCategoryShortName] + count;
+          					}
+          					thaaliCounts[thaaliMenu] =  data;
+          				}else{
+          					//Not signed up for thaali
+          					label.dates[j].signedUp = "No";
+          				}          				
+          				
+          			}
+          			if(label.thaaliCategory != differentThaaliCategories && label.rice == "No"){
+          				label.thaaliCategory = label.thaaliCategory + " (No Rice)";
+          			}
+          			labels.push(label);
+      			}
+  			}   			
+  		}
+		var labelReport = new Object();
+		labelReport.thaaliCounts = thaaliCounts;
+		labels.push(labelReport); //for reporting purposes
+		
+		var thaaliCountReport = new Object();
+		thaaliCountReport.thaaliLocation = thaaliLocation;
+		labels.push(thaaliCountReport); //for reporting purposes
+		
+		//console.log(labels);
+		//Create a HTML table with this data
+		var numOfRows = 10;
+		var numOfColsPerPage = 30; //as per avery 5160 template
+		var numOfPages = labels.length/numOfColsPerPage;
+		var htmlTable = "";
+		var numOfColsPerRow = 3; //as per avery 5160 template
+		
+		//Pages
+		var labelCounter = 0;
+		for(var i=0;i<numOfPages; i++){
+			htmlTable += "<table id=\'table_"+i+"\'>";
+			for(var j=0; j<numOfRows; j++){
+				htmlTable += "<tr id=\'row_"+j+"\'>";
+				for(var k=0;k<numOfColsPerRow; k++){
+					if(labelCounter < labels.length-2){
+						//Anything but last label
+						var colHtml = convertLabelToHtml(labels[labelCounter++]);
+						htmlTable += "<td>"+colHtml+"</td>";
+					}else if(labelCounter == labels.length-2){
+						//Second to Last label is the report of thaali count						
+						var colHtml = convertReportLabelToHtml(labels[labelCounter++]);
+						htmlTable += "<td>"+colHtml+"</td>";
+					}else if(labelCounter == labels.length-1){
+						//Last label is the report of thaali location count						
+						var colHtml = convertLocationLabelToHtml(labels[labelCounter++]);
+						htmlTable += "<td>"+colHtml+"</td>";
+					} else{
+						// empty cell until page is completed
+						htmlTable += "<td></td>";
+					}					
+				}
+				htmlTable += "</tr>";
+			}
+			htmlTable += "</table>";
+			htmlTable += "<div class=\"page-break\"></div>";
+
+		}				
+		var innerHTMLText = "<!DOCTYPE html><html lang=\"en\"><head><title>Thaali Data</title><style type=\"text/css\">body{width: 8.5in;margin:0.5in 0.1875in}.label{width:2.325in;height:.875in;padding:.125in .15in 0in;margin-right:.125in;float:left;text-align:center;overflow:hidden;outline:1px dotted;font-size: 13px}.page-break{clear:left;display:block;page-break-after:always}@media print{body {width: 8.5in;margin-top: 0.5in; margin-bottom: 0.5in; margin-left: .1875in; margin-right: .1875in} .label{width:2.325in;height:.875in;padding:.125in .15in 0in;margin-right:.125in;float:left;text-align:center;overflow:hidden;outline:1px;font-size: 13px} .page-break{clear:left;display:block;page-break-after:always}}@page :left {margin: .1875in;}@page :right {margin: .1875in;}@page :top {margin: 0.5in;}@page :bottom {margin: 0.5in;}</style></head><body>"+htmlTable+"</body></html>";
+		console.log(innerHTMLText);
+		
+		
+		var w = window.open();
+		$(w.document.body).html(innerHTMLText);	
+		
+	}
+}
+
+convertReportLabelToHtml = function(labelReport){
+	var html = "";
+	html += "<b>Thaali Counts</b><br/>";
+	for (var menu in labelReport.thaaliCounts) {
+		html += menu + " : ";
+		var thaaliCounts = labelReport.thaaliCounts[menu];
+		for( var thaaliCategory in thaaliCounts){
+			var categoryCount = thaaliCounts[thaaliCategory];
+			html += thaaliCategory + "=" + categoryCount + ",";			
+		}
+		html += "<br/>";
+	}
+	return "<div class=\"label\">"+html+"</div>";
+}
+
+convertLocationLabelToHtml = function(labelReport){
+	var html = "";
+	html += "<b>Thaali Counts Per Location</b><br/>";
+	for (var location in labelReport.thaaliLocation) {
+		html += "<b>" + location + " : " + labelReport.thaaliLocation[location] +"</b><br/>";
+	}
+	return "<div class=\"label\">"+html+"</div>";
+}
+
+
+convertLabelToHtml = function(label){
+	var html = "";
+	html += label.location + "<br/>";
+	html += "<b>" + label.name + "</b><br/>";
+	html += label.thaaliCategory + "<br/>";
+	for(var i=0; i<label.dates.length; i++){
+		if(label.dates[i].signedUp == "No"){
+			html += "<del>"+label.dates[i].menu+"</del>";
+		}else{
+			html += label.dates[i].menu;
+		}
+		if(i < label.dates.length-1){
+			html += " | ";
+		}
+	}
+	return "<div class=\"label\">"+html+"</div>";	
+	
+}
+
+
 
 /********************************************* Register new user functionality starts here ***********************************************************************************/
 validateRegisterUserForm = function(){
@@ -1894,6 +2135,8 @@ onLoadRegisterNewUser = function(){
 				var emailAddress = $('#emailAdd').val();
 				var emailDelivery = $('#tEmailType').val();
 				var familyGroupId = 0;
+				var rice = $('#tRice').val();
+				var numofFamilyMembers = $('#tFamilyCountLabel').val();
 				
 				if($('#radioNewFamily').is(':checked')){
 					//means we are registering user for a new family, in this case the 
@@ -1916,7 +2159,9 @@ onLoadRegisterNewUser = function(){
 				   "userRole":userRole,
 				   "familyGroupId":familyGroupId,
 				   "emailAddresses":emailAddress,
-				   "emailType":emailDelivery
+				   "emailType":emailDelivery,
+				   "rice":rice,
+				   "numOfFamilyMembers":numofFamilyMembers
 			    };
 			   
 			   var userProfileArr = new Array();
@@ -2182,7 +2427,99 @@ onLoadUserFeedback = function(){
        	
 }
 
+/***********************         User Miqaat Registration Functionality starts                   ********************************/
 
+/**
+ * This method would be invoked by the onload method on the user thaali page.
+ */
+onLoadUserRegistration = function(){
+	
+	 //Initializing a popup window, we would need this to display any success/error messages.
+	$("#miqaatRegistrationMsgPopup").jqxWindow({ width: 500, height: 100 , autoOpen:false, theme:themeName});
+	
+    //Will have to check the isError attribute on the response object returned before proceeding any further.
+    
+    var initialRowsLoadedFromDatabase = -1;
+    
+    // prepare the data
+    var source =
+    {
+        //json/xml doesn't matter
+        datatype: "json",
+        datafields: [
+            { name: 'miqaatDate', type: 'date', format: 'yyyy-MM-dd'},
+            { name: 'timestamp', type: 'string'},
+            { name:'miqaatName', type: 'string'},                  
+            { name:'firstName', type: 'string'},
+            { name:'familyName', type: 'string'},
+            { name:'familyMembers', type: 'string'},
+            { name:'covidStatus', type: 'string'}  
+        ],
+        url: createUserMiqaatRegistrationUrl()
+    };
+    
+    getDataAdapter = function(source){
+    	var dataAdapter = new $.jqx.dataAdapter(source,{
+        	loadError: function(jqXHR, status, error){
+        		$("#miqaatRegistrationMsgContent").html(server_error_msg);
+            	$("#miqaatRegistrationMsgPopup").jqxWindow('open');
+        	},
+        	//This method will get invoked when the data is returned from the server.
+        	downloadComplete: function (edata, textStatus, jqXHR){
+        		if(edata.error == true){
+        			//An error has occurred.
+        			$("#miqaatRegistrationMsgContent").html(server_error_msg);
+                	$("#miqaatRegistrationMsgPopup").jqxWindow('open');
+        		}
+        	}        	     	
+        	
+        });
+    	return dataAdapter;
+    };
+    
+    
+    
+    
+    //Need to align the column heading  in the center
+    var columnsrenderer = function (value) {
+    	return '<div style="text-align: center; margin-top: 5px;">' + value + '</div>';
+    }
+    
+    getTableHeader  = function(){
+    	if(isMobileView()){
+    		return userMiqaatRegistrationTblHeaders;
+    	}
+    	return userMiqaatRegistrationTblHeaders;
+    }
+    
+    $("#jqxUserMiqaatRegistrationGrid").jqxGrid(
+    {	
+    	source: getDataAdapter(source),
+    	theme: themeName,
+    	altrows: true,
+    	autorowheight:true,
+    	width: '100%',
+        columnsresize:true,
+        height: getHeight(),
+        pageable: true,
+        rowsheight: 40,
+        columnsresize:true,
+        columnsheight: columnsHeight,
+        editable: true,
+        pagesize: getPageSize(),  
+
+        columns: [
+            { text: getTableHeader()[0].Name, datafield: 'miqaatDate', renderer: columnsrenderer, cellsalign: 'center',   width: getTableHeader()[0].Width, editable: false,cellsformat: 'D'},
+            { text: getTableHeader()[1].Name, datafield: 'timestamp', renderer: columnsrenderer, cellsalign: 'center',   width: getTableHeader()[1].Width, editable: false},
+            { text: getTableHeader()[2].Name, datafield: 'miqaatName', renderer: columnsrenderer, cellsalign: 'center',   width: getTableHeader()[2].Width, editable: false},
+            { text: getTableHeader()[3].Name, datafield: 'firstName', renderer: columnsrenderer, width: getTableHeader()[3].Width, cellsalign: 'center', editable: false}, 
+            { text: getTableHeader()[4].Name, datafield: 'familyName', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[4].Width, editable: false },
+            { text: getTableHeader()[5].Name, datafield: 'familyMembers', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[5].Width, editable: false },
+            { text: getTableHeader()[6].Name, datafield: 'covidStatus', renderer: columnsrenderer, cellsalign: 'center',  width: getTableHeader()[6].Width, editable: false }
+        ]
+    });
+       	
+}
 
 /**
  * Determines the number of records to be displayed in a page depending upon the size of the screen.
@@ -2208,6 +2545,16 @@ createAdminThaaliDataGetUrl = function(fromDateObj, toDateObj){
 createUserFeedbackUrl = function(){
 	return user_feedback_service_url +"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&limit="+rowLimit;
 }
+
+createUserMiqaatRegistrationUrl = function(){
+	return user_miqaat_registration_service_url +"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&limit="+rowLimit;
+}
+
+
+createUserMiqaatDetailsUrl = function(){
+	return miqaat_details_service_url +"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&limit="+rowLimit;
+}
+
 
 /** Date utility method **/
 getUTCDate = function(dateStr){
@@ -2244,8 +2591,18 @@ createThaaliCountGetUrl = function(fromDateObj, toDateObj){
 	return thaali_count_service_url +"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&fromDate="+fromDate+"&toDate="+toDate;	
 }
 
+createMiqaatCountGetUrl = function(fromDateObj, toDateObj){
+	var fromDate = getFormattedDate(fromDateObj);
+	var toDate = getFormattedDate(toDateObj); 
+	return miqaat_count_service_url +"?ejamaatId="+getEjamaatId()+"&password="+getPassword()+"&fromDate="+fromDate+"&toDate="+toDate;	
+}
 
 
+getFormattedDateAmer = function(dateStr){
+	var estDateTime = dateStr + 'T10:00:00.0000z'; //we have to add a time else it will convert to GMT-5 and change the date
+	var dateObj = new Date(estDateTime);
+	return dateObj.toDateString();
+}
 /**
  * Utility method to convert the date object from any format to the format MM/dd/yyyy
  */
@@ -2319,6 +2676,7 @@ toggle = function(activeId){
 		$('#thaaliInformation').attr('style','display: block; ');
 		$('#listThaaliSignups').attr('style','display: block; ');
 		$('#thaaliCount').attr('style','display: block; ');
+		$('#thaaliCount').attr('style','display: block; ');		
 	}else if(userRole == "ADMIN"){
 		$('#thaaliInformation').attr('style','display: none; ');
 		$('#listThaaliSignups').attr('style','display: block; ');
@@ -2469,7 +2827,44 @@ initLogin = function(){
 	
 }
 
-
+validateMiqaatRegistrationForm = function(){
+	
+    $('#miqaatRegistrationForm').validate({
+	    rules: {	    	
+	    	eligibleCheckbox: {
+	    		required:true
+            },
+            signupCheckbox: {
+            	required:true
+            },
+            covidStatus:{
+	        	required:true                
+	        }           
+	    },
+	    
+	    highlight: function(element) {
+	        $(element).closest('.form-group').removeClass('success').addClass('has-error');
+	    },
+	    
+	    messages: {
+	    	eligibleCheckbox: {
+	    		required: "Please click on the eligibility checkbox"
+	    	},
+	    	
+	    	signupCheckbox: {
+	    		required: "Please click on the signup checkbox"
+	    	},
+	    	
+	    	covidStatus: {
+	    		required: "Please select your vaccination status"
+	    	},
+	    	
+	    	miqaatName:{
+	    		required: "There are currently no miqaats to signup for"
+	    	}
+		}
+	});
+}
 
 validateFeedbackForm = function(){
 	
@@ -2510,6 +2905,86 @@ validateFeedbackForm = function(){
 	    	}
 		}
 	});
+}
+
+//Functionality for submitting miqaat registration
+onLoadMiqaatRegistration = function(){	
+    
+    $('#miqaatRegistrationErrorCallout').hide();
+	$('#miqaatRegistrationSuccessCallout').hide();
+
+	//Need to send the data over the wire to be saved in the db.
+	var jsonData = {};
+	jsonData.eJamaatId = getEjamaatId(); 
+	jsonData.password = getPassword();
+	
+	var jsonStr = JSON.stringify(jsonData);
+	
+	 var url = createUserMiqaatDetailsUrl();
+	 var dataObj = handleAjax("GET",url,"");
+	   if(!dataObj.error){
+		   var detailObj = dataObj.jsonData.dataList[0];
+		   $('#miqaatName').html(detailObj.miqaatName);
+		   $('#miqaatName1').html(detailObj.miqaatName);
+		   $('#miqaatDate').html(detailObj.miqaatDate);
+		   $('#miqaatDateStr').html(getFormattedDateAmer(detailObj.miqaatDate));
+			document.getElementById('submitRegistrationBtn').disabled = false;
+	   }else{
+		   $('#miqaatRegistrationErrorCallout').html(dataObj.message);
+		   $('#miqaatRegistrationErrorCallout').show();
+		   $('#miqaatRegistrationSuccessCallout').hide();
+		   document.getElementById('submitRegistrationBtn').disabled = true;
+	   }
+	
+	$('#submitRegistrationBtn').on('click',function(){
+		//We need to validate the feedback form before submitting it.
+		validateMiqaatRegistrationForm();
+		
+		var isValid = $('#miqaatRegistrationForm').valid();
+		isValid = isValid && $("#miqaatDate").html().trim().length > 0 && $("#miqaatName").html().trim().length > 0;  
+		if(isValid){
+			//reset the error classes..
+			$('div').removeClass('has-error');
+			
+			var miqaatName = $('#miqaatName').html();
+			var miqaatDate = $('#miqaatDate').html();
+			var eligibility = $('#eligibleCheckbox').html();
+			var signup = $('#signupCheckbox').html();
+			var covidStatus = $( "#covidStatus option:selected" ).text();
+			var familyMembers = $('#members').val();
+			
+
+			//Need to send the data over the wire to be saved in the db.
+			var jsonData = {};
+			jsonData.eJamaatId = getEjamaatId(); 
+			jsonData.password = getPassword();
+			
+			var registration = {eJamaatId:getEjamaatId(),firstName:getFirstName(),familyName:getFamilyName(),familyGroupId:getFamilyGroupId(),
+					eligibility:eligibility,signup:signup,covidStatus:covidStatus, familyMembers: familyMembers, miqaatName:miqaatName, miqaatDate:miqaatDate};
+			
+			//Creating an array of feedback, since the server accepts the data as a list.
+			var registrationArr =  new Array();
+			registrationArr.push(registration);
+			
+			jsonData.dataList = registrationArr;
+			var jsonStr = JSON.stringify(jsonData);
+			
+			 var url = miqaat_registration_service_url;
+			 var dataObj = handleAjax("POST",url,jsonStr); 
+			   if(!dataObj.error){
+				   //display success popup..
+				   $('#miqaatRegistrationErrorCallout').hide();
+				   $('#miqaatRegistrationSuccessCallout').show();
+				   
+			   }else{
+				   $('#miqaatRegistrationErrorCallout').show();
+				   $('#miqaatRegistrationSuccessCallout').hide();
+			   }
+		}
+		
+		return false;//need to always return false.
+	   }
+	);
 }
 
 //Functionality for submitting thaali feedback..
@@ -2804,11 +3279,15 @@ onLoadThaaliCalendar = function(){
 				
 				
 				if (isLocked == true) {
-					if (thaaliData.userThaaliStatus == "NOT_REQUESTED_BY_USER") {
+					if (thaaliData.userThaaliStatus == "NOT_REQUESTED_BY_USER" && miqaat == true) {
 						//Means the thaali date has been frozen...no more modifications allowed at this time.
 						disabled = true;
-						displayMsg = msg_on_thaali_frozen
-					} else {
+						displayMsg = msg_on_miqaat_frozen
+					} else if (thaaliData.userThaaliStatus == "NOT_REQUESTED_BY_USER" ){
+						//Means the thaali date has been frozen...no more modifications allowed at this time.
+						disabled = true;
+						displayMsg = msg_on_thaali_frozen						
+					}else {
 						//What if the date has been passed, this means user cannot update the record anymore.
 						// make sure the thaali date is a future date and not a past date.
 						var today = new Date();
@@ -3036,6 +3515,7 @@ toggleButtonOnClick = function(obj){
 			thaaliRequestStateArr[buttonId] = thaaliRequested; //save the thaali state for later use.
 			if(miqaat === "true"){
 				thaaliDataObj.numOfPplAttending = $(numberInputId).jqxFormattedInput('value');
+				thaaliDataObj.userInstructions= "#MIQAAT";
 				
 			}else{
 				thaaliDataObj.numOfPplAttending = 0;
@@ -3277,7 +3757,7 @@ onLoadMiqaatCount = function(){
            { name: 'approxNumOfThaals', type:'string'},
            { name: 'miqaatInstructions', type: 'string' }          
        ],
-       url: createThaaliCountGetUrl(currentDate, toDate),  
+       url: createMiqaatCountGetUrl(currentDate, toDate),  
        sortcolumn: 'thaaliDate',
        sortdirection: 'asc'
    };
@@ -3356,7 +3836,7 @@ onLoadMiqaatCount = function(){
    		toDate = new Date($('#toDate').val());
         
        	//On success we need to refresh the thaali data.
-        source.url = createThaaliCountGetUrl(currentDate, toDate);
+        source.url = createMiqaatCountGetUrl(currentDate, toDate);
         $(gridName).jqxGrid('updatebounddata');         
    		
    	},

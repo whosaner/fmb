@@ -67,7 +67,7 @@ public class Response<T>{
 		return message;
 	}
 
-	
+	@XmlAttribute
 	public void setMessage(String message) {
 		this.message = message;
 	}

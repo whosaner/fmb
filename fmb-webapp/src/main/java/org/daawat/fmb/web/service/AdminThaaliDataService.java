@@ -12,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.daawat.fmb.api.db.MiqaatRegistrationDAO;
 import org.daawat.fmb.api.db.ThaaliCookDAO;
 import org.daawat.fmb.api.db.ThaaliDataDAO;
 import org.daawat.fmb.api.db.ThaaliFeedbackDAO;
@@ -21,6 +22,7 @@ import org.daawat.fmb.api.db.UserProfileDataDAO;
 import org.daawat.fmb.api.enums.EmailType;
 import org.daawat.fmb.api.enums.UserRole;
 import org.daawat.fmb.api.objects.FmbMailMessage;
+import org.daawat.fmb.api.objects.MiqaatRegistration;
 import org.daawat.fmb.api.objects.Request;
 import org.daawat.fmb.api.objects.Response;
 import org.daawat.fmb.api.objects.ThaaliCook;
@@ -29,12 +31,14 @@ import org.daawat.fmb.api.objects.ThaaliFeedback;
 import org.daawat.fmb.api.objects.ThaaliMenu;
 import org.daawat.fmb.api.objects.ThaaliRegion;
 import org.daawat.fmb.api.objects.UserProfileData;
+import org.daawat.fmb.impl.daos.MiqaatRegistrationDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliCookDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliDataDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliFeedbackDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliMenuDAOImpl;
 import org.daawat.fmb.impl.daos.ThaaliRegionDAOImpl;
 import org.daawat.fmb.impl.daos.UserProfileDataDAOImpl;
+import org.daawat.fmb.utils.DateUtils;
 import org.daawat.fmb.utils.Logger;
 import org.daawat.fmb.utils.PropertyFileManager;
 import org.daawat.fmb.utils.Utils;
@@ -193,7 +197,50 @@ public class AdminThaaliDataService extends BaseService{
 		return new Response<ThaaliFeedback>(thaaliFeedbackList, msg, isError);
 	}
 	
-	
+	@GET
+	@Path("/getMiqaatRegistrations")
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public Response<MiqaatRegistration> getMiqaatRegistrations(@QueryParam("ejamaatId")String eJamaatId, @QueryParam("password")String password, @QueryParam("limit")String limit){
+		String msg = "";  
+		boolean isError = false;
+		int rowLimit = 0;
+		List<MiqaatRegistration> registrationList = null;
+		
+		try{
+			Request<MiqaatRegistration> requestObj = new Request<MiqaatRegistration>();
+			requestObj.seteJamaatId(eJamaatId);
+			requestObj.setPassword(password);
+			
+			if(isSuperUser(requestObj, msg)){			
+				MiqaatRegistrationDAO registrationDAO = new MiqaatRegistrationDAOImpl();
+				if(limit != null && limit.trim().length() > 0){
+					try{
+						rowLimit = Integer.parseInt(limit);
+					}catch(Exception e){
+						rowLimit = 0;
+					}
+				}
+				
+				if(rowLimit == 0){
+					registrationList = registrationDAO.getMiqaatRegistrationAll();
+				}else{
+					registrationList = registrationDAO.getMiqaatRegistrationNRows(rowLimit);
+				}
+				
+				if(registrationList == null || registrationList.isEmpty()){
+					msg = "There are no miqaat registrations entered yet.";
+					Logger.info(COMP_NAME, msg);
+				}
+								
+			}
+		}catch(Exception e){
+			msg = "An exception has occurred inside getMiqaatRegistrations method, stacktrace is "+e;
+			Logger.error(COMP_NAME, msg,e);
+			isError = true;
+		}
+		
+		return new Response<MiqaatRegistration>(registrationList, msg, isError);
+	}
 	
 	/**
 	 * Method that would create a user profile in the db.
@@ -346,16 +393,20 @@ public class AdminThaaliDataService extends BaseService{
 			sendEmail = true;
 		}else{
 			//we need to notify only if the menu has changed, cook has changed or no thaali on that day
-			if(!uThaaliData.getMenu().equalsIgnoreCase(othaaliData.getMenu())){
-				//Means menu has changed we need to inform the cook..
-				//check if there is significant change in the menu. addition of tabs/space should not trigger a notification
-				sendEmail = true;
+			if(DateUtils.getDiffWithCurrentDate(uThaaliData.getThaaliDate()) > 0){
+				//thaali date has not passed yet...
+				if(!uThaaliData.getMenu().equalsIgnoreCase(othaaliData.getMenu())){
+					//Means menu has changed we need to inform the cook..
+					//check if there is significant change in the menu. addition of tabs/space should not trigger a notification
+					sendEmail = true;
+				}
+				if(!uThaaliData.getCookName().equalsIgnoreCase(othaaliData.getCookName())){
+					//Means cook has changed..see if the new cook has registered to receive notifications.
+					//TODO we need to inform the old cook about the change as well..
+					sendEmail = true;
+				}
 			}
-			if(!uThaaliData.getCookName().equalsIgnoreCase(othaaliData.getCookName())){
-				//Means cook has changed..see if the new cook has registered to receive notifications.
-				//TODO we need to inform the old cook about the change as well..
-				sendEmail = true;
-			}
+			
 		}
 		if(sendEmail){
 			FmbMailMessage mailMsg = new FmbMailMessage();

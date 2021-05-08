@@ -106,6 +106,48 @@ public class MiscService extends BaseService{
 	}
 	
 	@GET
+	@Path("/getMiqaatCount")
+	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+	public Response<ThaaliCount> getMiqaatCount(@QueryParam("ejamaatId")String eJamaatId, @QueryParam("password")String password, @QueryParam("fromDate")String fromThaaliDate, @QueryParam("toDate")String toThaaliDate){
+		String msg = "";
+		boolean isError = false;
+		List<ThaaliCount> thaaliCounts = null;
+		try{
+			authenticateUser(eJamaatId, password);			
+			Date fromDate = null;
+			Date toDate = null;
+			
+			if (StringUtils.isNullOrEmpty(fromThaaliDate)) {
+				//If fromDate is null we set it with current date.			
+				fromDate = DateUtils.getCurrentDate();							
+			}else{
+				fromDate = DateUtils.getDate(fromThaaliDate, DATE_PATTERN);
+			}
+			
+			if (StringUtils.isNullOrEmpty(toThaaliDate)) {
+				// If toDate is null we default to number of rows set in the properties file.
+				//we need to advance "numOfDays" from the given thaaliDate.
+				toDate = DateUtils.getToDate(fromDate, NUM_OF_DAYS);							
+			}else{
+				toDate = DateUtils.getDate(toThaaliDate, DATE_PATTERN);
+			}
+			
+			ThaaliCountDAO thaaliCountDAO = new ThaaliCountDAOImpl();
+			thaaliCounts = thaaliCountDAO.getMiqaatCount(fromDate, toDate);
+			
+			if(thaaliCounts == null || thaaliCounts.isEmpty()){
+				msg = "No thaalis currently present.";
+				Logger.info(COMP_NAME, msg);
+			}			
+		}catch(Exception ex){
+			msg = "An exception has occurred inside getThaaliCount for the i/p eJamaatId - "+eJamaatId+",password -"+password;
+			Logger.error(COMP_NAME, msg, ex);
+			isError = true;
+		}
+		return new Response<ThaaliCount>(thaaliCounts, msg, isError);
+	}
+	
+	@GET
 	@Path("/getThaaliCount")
 	@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 	public Response<ThaaliCount> getThaaliCount(@QueryParam("ejamaatId")String eJamaatId, @QueryParam("password")String password, @QueryParam("fromDate")String fromThaaliDate, @QueryParam("toDate")String toThaaliDate){

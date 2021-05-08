@@ -11,18 +11,30 @@ import org.daawat.fmb.utils.PropertyFileManager;
 
 public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements ThaaliCountDAO{
 
+	public final double XLARGE_RICE = 1.0;
 	public final double LARGE_RICE = 0.8;
 	public final double MEDIUM_RICE = 0.6;
 	public final double SMALL_RICE = 0.5;
+	public final double XSMALL_RICE = 0.3;
 	
+	public final double XLARGE_JAMAN = 1.75;
 	public final double LARGE_JAMAN = 1.25;
 	public final double MEDIUM_JAMAN = 1.0;
 	public final double SMALL_JAMAN = 0.8;
+	public final double XSMALL_JAMAN = 0.5;
 	
 	@Override
 	public List<ThaaliCount> getThaaliCounts(Date fromDate, Date toDate)
 			throws Exception {
 		String sqlQuery = PropertyFileManager.getProperty("thaalicount_select_query");
+		executeQuery(sqlQuery,fromDate, toDate);
+		return data;
+	}
+	
+	@Override
+	public List<ThaaliCount> getMiqaatCount(Date fromDate, Date toDate)
+			throws Exception {
+		String sqlQuery = PropertyFileManager.getProperty("miqaatcount_select_query");
 		executeQuery(sqlQuery,fromDate, toDate);
 		return data;
 	}
@@ -34,23 +46,29 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 		while(resultSet.next()){
 			ThaaliCount thaaliCount = new ThaaliCount();			
 			
+			int xSmall = resultSet.getInt("X_SMALL");
 			int small =  resultSet.getInt("SMALL");
 			int medium = resultSet.getInt("MED");			
 			int large =  resultSet.getInt("LARGE");
+			int xLarge = resultSet.getInt("X_LARGE");
 			
 			//set num of rice cups b4 calculating thaalis with no rice.
-			thaaliCount.setNumOfRiceCups(calculateNumOfRiceCups(small, medium, large));
+			thaaliCount.setNumOfRiceCups(calculateNumOfRiceCups(xSmall, small, medium, large, xLarge));
 			
+			xSmall += resultSet.getInt("X_SMALL_NO_RICE");
 			small += resultSet.getInt("SMALL_NO_RICE");
 			medium += resultSet.getInt("MED_NO_RICE");
 			large += resultSet.getInt("LARGE_NO_RICE");
+			xLarge += resultSet.getInt("X_LARGE_NO_RICE");
 			
+			thaaliCount.setNumOfXSmallThaalis(xSmall);
 			thaaliCount.setNumOfSmallThaalis(small);
 			thaaliCount.setNumOfMediumThaalis(medium);
 			thaaliCount.setNumOfLargeThaalis(large);
-			thaaliCount.setTotalNumOfThaalis(small+medium+large);
+			thaaliCount.setNumOfXLargeThaalis(xLarge);
+			thaaliCount.setTotalNumOfThaalis(xSmall+small+medium+large+xLarge);
 			thaaliCount.setThaaliDate(resultSet.getDate("THAALI_DATE"));
-			thaaliCount.setJamanQty(calculateJamanQty(small,medium,large));
+			thaaliCount.setJamanQty(calculateJamanQty(xSmall, small,medium,large, xLarge));
 			
 			thaaliCount.setNumOfPpl(resultSet.getInt("NUM_OF_PPL"));
 			
@@ -63,13 +81,13 @@ public class ThaaliCountDAOImpl extends BaseJDBCDAO<ThaaliCount> implements Thaa
 		return thaaliCounts;
 	}
 	
-	public int calculateNumOfRiceCups(int small, int medium, int large){
-		int numOfRiceCups = (int) Math.ceil(LARGE_RICE * large + MEDIUM_RICE * medium + SMALL_RICE * small);
+	public int calculateNumOfRiceCups(int xSmall, int small, int medium, int large, int xLarge){
+		int numOfRiceCups = (int) Math.ceil(XLARGE_RICE * xLarge + LARGE_RICE * large + MEDIUM_RICE * medium + SMALL_RICE * small + XSMALL_RICE * xSmall);
 		return numOfRiceCups;
 	}
 	
-	public int calculateJamanQty(int small, int medium, int large){
-		int jamanQty = (int) Math.ceil(LARGE_JAMAN * large + MEDIUM_JAMAN * medium + SMALL_JAMAN * small);
+	public int calculateJamanQty(int xSmall, int small, int medium, int large, int xLarge){
+		int jamanQty = (int) Math.ceil(XLARGE_JAMAN * xLarge + LARGE_JAMAN * large + MEDIUM_JAMAN * medium + SMALL_JAMAN * small + XSMALL_JAMAN * xSmall);
 		return jamanQty;
 	}
 	
